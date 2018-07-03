@@ -1,0 +1,38 @@
+<div class="notes">
+	<div>
+		<input placeholder="search">
+	</div>
+	<div class="scroller">
+	</div>
+</div>
+
+
+<script>
+import Data from '../data';
+
+export default {
+	data () {
+		return {
+			isLoading: true,
+			items: [],
+		};
+	},
+	oncreate () {
+		this.load();
+	},
+
+	methods: {
+		load () {
+			if (!this.get().items.length) this.set({ isLoading: true });
+			Data.Notes.get().then(items => {
+				this.set({ items, isLoading: false });
+			});
+		},
+
+		onclick (item, el) {
+			this.fire('click', item);
+		},
+
+	}
+};
+</script>

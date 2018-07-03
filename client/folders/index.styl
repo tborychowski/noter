@@ -1,0 +1,27 @@
+@import "lib"
+
+.folders
+	position absolute
+	left 0
+	top 0
+	bottom 0
+	width 199px
+	transform translateX(0)
+	transition transform .3s ease-out
+	background #333
+	color #ccc
+	display flex
+	flex-flow column
+
+	h1
+		display flex
+		justify-content space-between
+		align-items center
+		b 0
+		margin 10
+		font 20
+
+	.scroller
+		flex 1
+		overflow hidden
+		overflow-y auto

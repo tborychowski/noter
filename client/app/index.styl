@@ -1,0 +1,23 @@
+@import "lib"
+
+#app
+	position absolute
+	top 0
+	left 0
+	right 0
+	bottom 0
+	background border-dark
+	color text-dark
+	padding 0 0 0 200px
+	overflow-y auto
+	display flex
+	flex-flow row
+	transition padding .3s ease-out
+
+
+@media (max-width: 900px)
+	.folders
+		transform translateX(-100%)
+
+	#app
+		padding-left 0

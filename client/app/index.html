@@ -1,0 +1,21 @@
+<Folders ref:folders></Folders>
+<Notes ref:notes></Notes>
+
+<script>
+import Folders from '../folders';
+import Notes from '../notes';
+
+export default {
+	components: { Folders, Notes },
+	oncreate () {
+		this.refs.folders.on('click', this.onFolderChange.bind(this));
+	},
+
+	methods: {
+		onFolderChange () {
+
+		}
+	}
+};
+
+</script>
