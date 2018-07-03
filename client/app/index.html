@@ -1,12 +1,14 @@
 <Folders ref:folders></Folders>
 <Notes ref:notes></Notes>
+<Editor ref:editor></Editor>
 
 <script>
 import Folders from '../folders';
 import Notes from '../notes';
+import Editor from '../editor';
 
 export default {
-	components: { Folders, Notes },
+	components: { Folders, Notes, Editor },
 	oncreate () {
 		this.refs.folders.on('click', this.onFolderChange.bind(this));
 	},
