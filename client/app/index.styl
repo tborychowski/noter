@@ -6,27 +6,33 @@
 	left 0
 	right 0
 	bottom 0
-	background border-dark
-	color text-dark
+	background #888
+	color #ccc
 	padding 0
 	overflow hidden
-	display flex
-	flex-flow row
-	flex-wrap wrap
+
+	display grid
+	grid-gap 1px
+	grid-template-columns auto auto 1fr
+	grid-template-rows: 50px auto
+	grid-template-areas "header header header" "folders notes editor"
 
 
-	header
-		background #333
-		margin-bottom 1px
-		width 100%
+	h1
+		margin 0
+		b 0
+
+
+	h2
 		display flex
-		align-items center
 		justify-content space-between
-		padding 10 20
+		align-items center
+		b 0
+		margin 10
+		font 20
 
-		h1
-			margin 0
+	.scroller
+		flex 1
+		overflow hidden
+		overflow-y auto
 
-@media (max-width: 900px)
-	#app
-		left -200px

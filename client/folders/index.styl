@@ -1,24 +1,17 @@
 @import "lib"
 
 .folders
-	height 100%
+	grid-area folders
 	width 200px
+	transition width .2s
 	background #333
 	color #ccc
+	overflow hidden
 	display flex
 	flex-flow column
-	transition transform .3s ease-out
 	border-right #555
 
-	h1
-		display flex
-		justify-content space-between
-		align-items center
-		b 0
-		margin 10
-		font 20
 
-	.scroller
-		flex 1
-		overflow hidden
-		overflow-y auto
+@media (max-width: 900px)
+	.folders
+		width 0

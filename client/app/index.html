@@ -1,18 +1,16 @@
-<header>
-	<h1>NOTTER</h1>
-	<input placeholder="search">
-</header>
+<Header></Header>
 <Folders ref:folders></Folders>
 <Notes ref:notes></Notes>
 <Editor ref:editor></Editor>
 
 <script>
+import Header from '../header';
 import Folders from '../folders';
 import Notes from '../notes';
 import Editor from '../editor';
 
 export default {
-	components: { Folders, Notes, Editor },
+	components: { Header, Folders, Notes, Editor },
 	oncreate () {
 		this.refs.folders.on('click', this.onFolderChange.bind(this));
 	},

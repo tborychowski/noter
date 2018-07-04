@@ -1,13 +1,18 @@
 @import "lib"
 
 .notes
+	grid-area notes
 	width 300px
+	transition width .2s
 	background #333
 	color #ccc
+	overflow hidden
 	display flex
 	flex-flow column
 
-	.scroller
-		flex 1
-		overflow hidden
-		overflow-y auto
+
+
+@media (max-width: 600px)
+	.notes
+		width 0
+
