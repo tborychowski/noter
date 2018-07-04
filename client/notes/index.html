@@ -1,6 +1,6 @@
 <div class="notes">
 	<div>
-		<input placeholder="search">
+		<button class="btn" on:click="add()">+</button>
 	</div>
 	<div class="scroller">
 	</div>
@@ -27,6 +27,10 @@ export default {
 			Data.Notes.get().then(items => {
 				this.set({ items, isLoading: false });
 			});
+		},
+
+		add () {
+			console.log('adding note');
 		},
 
 		onclick (item, el) {
