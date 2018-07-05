@@ -1,26 +1,25 @@
 const Sequelize = require('sequelize');
-const util = require('../util');
+const config = require('config');
+const logger = require('../lib/logger');
 
-const dbName = (util.isTest ? 'database-test.db' : 'database.db');
-const sequelize = new Sequelize(`sqlite:${dbName}`, {
+const dbname = config.get('dbname');
+const sequelize = new Sequelize(`sqlite:${dbname}`, {
 	define: { timestamps: false, underscored: true },
 	operatorsAliases: false,
-	// logging: s => console.log(`${s}\n`)
-	logging: false
+	logging: s => logger.debug(`DB: ${s}\n`)
 });
 
-// console.log('\n\n\n\n*************************** APP STARTING ***************************\n\n');
-// sequelize.authenticate()
-// 	.then(() => console.log('Connected to the database: ' + dbName))
-// 	.catch(err => console.error('Unable to connect to the database:', err));
+sequelize.authenticate()
+	.then(() => logger.info('Connected to the database: ' + dbname))
+	.catch(err => logger.error('Unable to connect to the database:', err));
 
 
-const Folder = sequelize.define('category', {
+const Folder = sequelize.define('folder', {
 	id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
 	name: { type: Sequelize.TEXT, allowNull: false, unique: true },
 });
 
-const Note = sequelize.define('entry', {
+const Note = sequelize.define('note', {
 	id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
 	title: { type: Sequelize.TEXT, allowNull: false, defaultValue: 'New note' },
 	url: { type: Sequelize.TEXT, defaultValue: '' },
