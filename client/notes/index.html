@@ -1,10 +1,17 @@
 <div class="notes">
+	{#if folder}
 	<h2>
-		Folder 1
+		<span>{folder.name || ''}</span>
 		<button class="btn" on:click="add()">+</button>
 	</h2>
 	<div class="scroller">
+		{#each notes as item}
+		<a href="#{item.id}"
+		class="note {selected === item ? 'selected' : ''}"
+		on:click="select(item)">{item.title}</a>
+		{/each}
 	</div>
+	{/if}
 </div>
 
 
@@ -15,27 +22,41 @@ export default {
 	data () {
 		return {
 			isLoading: true,
+			folder: null,
+			selected: null,
 			items: [],
 		};
 	},
-	oncreate () {
-		this.load();
+	computed: {
+		notes ({items}) {
+			return items.sort((a, b) => a.title.localeCompare(b.title));
+		}
 	},
 
 	methods: {
-		load () {
+		load (folder) {
+			if (!folder) return this.set({ items: [], isLoading: false, folder: null });
 			if (!this.get().items.length) this.set({ isLoading: true });
-			Data.Notes.get().then(items => {
-				this.set({ items, isLoading: false });
+			Data.Notes.get(folder.id).then(items => {
+				this.set({ items, isLoading: false, folder });
 			});
 		},
 
 		add () {
-			console.log('adding note');
+			const folder_id = this.get().folder.id;
+			Data.Notes
+				.save({ id: null, name: 'New note', folder_id })
+				.then(item => {
+						const items = this.get().items;
+						items.unshift(item);
+						this.set({ items });
+						this.select(item);
+					});
 		},
 
-		onclick (item, el) {
-			this.fire('click', item);
+		select (item) {
+			this.set({ selected: item });
+			this.fire('select', item);
 		},
 
 	}

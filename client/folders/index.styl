@@ -9,7 +9,34 @@
 	overflow hidden
 	display flex
 	flex-flow column
-	border-right #555
+	position relative
+
+
+	.folder
+		display block
+		color inherit
+		padding 7 10
+		text-decoration none
+
+		&:focus
+		&:hover
+			background-color #fff1
+			outline none
+
+		&.selected
+			background-color #fff3
+
+
+	.inline-edit
+		display none
+		position fixed
+
+
+	&.in-edit
+		.inline-edit
+			display block
+
+
 
 
 @media (max-width: 900px)

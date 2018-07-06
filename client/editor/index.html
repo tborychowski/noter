@@ -1,10 +1,16 @@
 <div class="editor">
+	{#if note}
 	<h2>
-		Note 1
-		<button class="btn">Edit</button>
+		<input value="{note.title || ''}">
+		<div class="flex-filler"></div>
+		<button class="btn">Save</button>
+		<button class="btn">Delete</button>
+		<button class="btn">&times;</button>
 	</h2>
 	<div class="scroller">
+		<textarea>{note.text || ''}</textarea>
 	</div>
+	{/if}
 </div>
 
 
@@ -15,15 +21,18 @@ export default {
 	data () {
 		return {
 			isLoading: true,
-			items: [],
+			note: null,
 		};
-	},
-	oncreate () {
-		this.load();
 	},
 
 	methods: {
-		load () {
+		load (note) {
+			if (!note) return this.set({ note: null, isLoading: false });
+			if (!this.get().note) this.set({ isLoading: true });
+
+			Data.Notes.getOne(note.id).then(res => {
+				this.set({ note: res, isLoading: false });
+			});
 		},
 	}
 };

@@ -11,7 +11,6 @@ function req (url, method = 'GET', params) {
 	return fetch(`api/${url}`, opts).then(res => res.json());
 }
 
-const trimDate = date => ('' + date).substr(0, 7);
 const get = url => req(url);
 const post = (url, params) => req(url, 'POST', params);
 const put = (url, params) => req(url, 'PUT', params);
@@ -37,8 +36,11 @@ const Folders = {
 
 const Notes = {
 	base: 'notes',
-	get (date) {
-		return get(`${this.base}?date=${trimDate(date)}`);
+	get (folder) {
+		return get(`${this.base}?folder=${folder}`);
+	},
+	getOne (id) {
+		return get(`${this.base}/${id}`);
 	},
 	save (data) {
 		return save(this.base, data);

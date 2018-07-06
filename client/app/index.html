@@ -11,14 +11,27 @@ import Editor from '../editor';
 
 export default {
 	components: { Header, Folders, Notes, Editor },
+	data () {
+		return {
+			folder: null,
+			note: null,
+		};
+	},
 	oncreate () {
-		this.refs.folders.on('click', this.onFolderChange.bind(this));
+		this.refs.folders.on('select', this.onFolderChange.bind(this));
+		this.refs.notes.on('select', this.onNoteChange.bind(this));
 	},
 
 	methods: {
-		onFolderChange () {
+		onFolderChange (folder) {
+			this.set({ folder });
+			this.refs.notes.load(folder);
+		},
 
-		}
+		onNoteChange (note) {
+			this.set({ note });
+			this.refs.editor.load(note);
+		},
 	}
 };
 

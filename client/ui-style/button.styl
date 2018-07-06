@@ -7,11 +7,19 @@ danger-color = #9a1616
 warning-color = #fa6800
 
 
+button::-moz-focus-inner
+	padding 0 !important
+	border 0
+
+
 .btn
-	show 1;
-	padding 3 10 4
-	min-width 80px
-	margin-bottom 0;
+	font inherit
+	show 1
+	line-height 1
+	padding 2 10
+	min-width 24px
+	min-height 24px
+	margin-bottom 0
 	font 14/1.4
 	height auto;
 	text-align center
@@ -33,7 +41,7 @@ warning-color = #fa6800
 	background linear-gradient(lighten(default-color, 10%), darken(default-color, 10%))
 
 	&:focus
-		box-shadow 0 0 1px 1px darken(default-color, 50%)
+		box-shadow 0 0 1px 1px lighten(default-color, 50%)
 
 	&:active
 		background linear-gradient(default-color, darken(default-color, 15%))
@@ -47,7 +55,7 @@ warning-color = #fa6800
 		background linear-gradient(lighten(success-color, 10%), darken(success-color, 10%))
 
 		&:focus
-			box-shadow 0 0 1px 1px darken(success-color, 50%)
+			box-shadow 0 0 1px 1px lighten(success-color, 50%)
 
 		&:active
 			background linear-gradient(success-color, darken(success-color, 15%))
@@ -59,7 +67,7 @@ warning-color = #fa6800
 		background linear-gradient(lighten(info-color, 10%), darken(info-color, 10%))
 
 		&:focus
-			box-shadow 0 0 1px 1px darken(info-color, 50%)
+			box-shadow 0 0 1px 1px lighten(info-color, 50%)
 
 		&:active
 			background linear-gradient(info-color, darken(info-color, 15%))
@@ -71,7 +79,7 @@ warning-color = #fa6800
 		background linear-gradient(lighten(danger-color, 10%), darken(danger-color, 10%))
 
 		&:focus
-			box-shadow 0 0 1px 1px darken(danger-color, 50%)
+			box-shadow 0 0 1px 1px lighten(danger-color, 50%)
 
 		&:active
 			background linear-gradient(danger-color, darken(danger-color, 15%))
@@ -83,7 +91,7 @@ warning-color = #fa6800
 		background linear-gradient(lighten(warning-color, 10%), darken(warning-color, 10%))
 
 		&:focus
-			box-shadow 0 0 1px 1px darken(warning-color, 50%)
+			box-shadow 0 0 1px 1px lighten(warning-color, 50%)
 
 		&:active
 			background linear-gradient(warning-color, darken(warning-color, 15%))

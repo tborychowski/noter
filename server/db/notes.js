@@ -9,9 +9,9 @@ function get (query) {
 	const where = {};
 	if (query.folder) where.folder_id = query.folder;
 	return Note.findAll({
-		order: [['id', 'DESC'], ['date', 'DESC']],
+		order: [['title', 'ASC'], ['id', 'DESC']],
 		where,
-		include: Folder
+		// include: Folder
 	});
 }
 
