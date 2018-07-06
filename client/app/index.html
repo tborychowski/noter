@@ -20,6 +20,7 @@ export default {
 	oncreate () {
 		this.refs.folders.on('select', this.onFolderChange.bind(this));
 		this.refs.notes.on('select', this.onNoteChange.bind(this));
+		this.refs.editor.on('save', this.onEditorSave.bind(this));
 	},
 
 	methods: {
@@ -32,6 +33,13 @@ export default {
 			this.set({ note });
 			this.refs.editor.load(note);
 		},
+
+		onEditorSave (note) {
+			this.set({ note });
+			this.refs.notes.load(this.get().folder);
+			this.refs.notes.select(note);
+		},
+
 	}
 };
 

@@ -1,15 +1,17 @@
 <div class="editor">
 	{#if note}
-	<h2>
-		<input value="{note.title || ''}">
-		<div class="flex-filler"></div>
-		<button class="btn">Save</button>
-		<button class="btn">Delete</button>
-		<button class="btn">&times;</button>
-	</h2>
-	<div class="scroller">
-		<textarea>{note.text || ''}</textarea>
-	</div>
+	<form on:submit="save(event)">
+		<h2>
+			<input bind:value="note.title">
+			<div class="flex-filler"></div>
+			<button type="submit" class="btn">Save</button>
+			<button type="button" class="btn">Delete</button>
+			<button type="button" class="btn">&times;</button>
+		</h2>
+		<div class="scroller">
+			<textarea bind:value="note.text"></textarea>
+		</div>
+	</form>
 	{/if}
 </div>
 
@@ -34,6 +36,14 @@ export default {
 				this.set({ note: res, isLoading: false });
 			});
 		},
+
+		save (e) {
+			e.preventDefault();
+			const note = this.get().note;
+			Data.Notes.save(note).then(res => {
+				this.fire('save', note);
+			});
+		}
 	}
 };
 </script>

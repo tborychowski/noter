@@ -7,7 +7,7 @@
 	<div class="scroller">
 		{#each notes as item}
 		<a href="#{item.id}"
-		class="note {selected === item ? 'selected' : ''}"
+		class="note {isSelected(item, selected) ? 'selected' : ''}"
 		on:click="select(item)">{item.title}</a>
 		{/each}
 	</div>
@@ -30,6 +30,12 @@ export default {
 	computed: {
 		notes ({items}) {
 			return items.sort((a, b) => a.title.localeCompare(b.title));
+		}
+	},
+	helpers: {
+		isSelected (item, selected) {
+			if (!selected || !item) return false;
+			return selected.id === item.id;
 		}
 	},
 
