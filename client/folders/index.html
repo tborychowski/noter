@@ -53,6 +53,11 @@ export default {
 			this.edit(newItem);
 		},
 
+		removeFromList (item) {
+			const items = this.get().items.filter(i => i !== item);
+			this.set({ items });
+		},
+
 		edit (item) {
 			this.set({ edited: item, selected: item });
 			this.refs.editor.value = item.name;
@@ -73,16 +78,20 @@ export default {
 		save () {
 			const edited = this.get().edited;
 			if (!edited) return;
-
-			const idx = this.itemToIdx(edited);
-			const items = this.get().items;
-			items[idx].name = this.refs.editor.value;
-			this.set({ items });
-			Data.Folders.save(items[idx]);
-			this.cancelEdit();
+			edited.name = this.refs.editor.value;
+			Data.Folders.save(edited).then(res => {
+				const items = this.get().items;
+				const idx = this.itemToIdx(edited);
+				items[idx] = edited.id ? edited : res;
+				this.set({ items });
+				this.selectItem(items[idx]);
+				this.cancelEdit();
+			});
 		},
 
 		cancelEdit () {
+			const edited = this.get().edited;
+			if (!edited.id) this.removeFromList(edited);
 			this.refs.editor.value = '';
 			this.set({ edited: null });
 		},

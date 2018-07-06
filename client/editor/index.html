@@ -2,10 +2,10 @@
 	{#if note}
 	<form on:submit="save(event)">
 		<h2>
-			<input bind:value="note.title">
+			<input bind:value="note.title" ref:title>
 			<div class="flex-filler"></div>
 			<button type="submit" class="btn">Save</button>
-			<button type="button" class="btn">Delete</button>
+			<button type="button" class="btn" on:click="del(note.id)">Delete</button>
 			<button type="button" class="btn">&times;</button>
 		</h2>
 		<div class="scroller">
@@ -34,6 +34,7 @@ export default {
 
 			Data.Notes.getOne(note.id).then(res => {
 				this.set({ note: res, isLoading: false });
+				this.refs.title.select();
 			});
 		},
 
@@ -42,6 +43,13 @@ export default {
 			const note = this.get().note;
 			Data.Notes.save(note).then(res => {
 				this.fire('save', note);
+			});
+		},
+
+		del (id) {
+			Data.Notes.del(id).then(res => {
+				this.set({ note: null });
+				this.fire('note-delete');
 			});
 		}
 	}

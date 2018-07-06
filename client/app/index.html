@@ -20,7 +20,9 @@ export default {
 	oncreate () {
 		this.refs.folders.on('select', this.onFolderChange.bind(this));
 		this.refs.notes.on('select', this.onNoteChange.bind(this));
+		this.refs.notes.on('folder-delete', this.onFolderDelete.bind(this));
 		this.refs.editor.on('save', this.onEditorSave.bind(this));
+		this.refs.editor.on('note-delete', this.onNoteDelete.bind(this));
 	},
 
 	methods: {
@@ -29,9 +31,20 @@ export default {
 			this.refs.notes.load(folder);
 		},
 
+		onFolderDelete () {
+			this.set({ folder: null });
+			this.refs.folders.load();
+			this.refs.notes.load();
+		},
+
 		onNoteChange (note) {
 			this.set({ note });
 			this.refs.editor.load(note);
+		},
+
+		onNoteDelete () {
+			this.set({ note: null });
+			this.refs.notes.load(this.get().folder);
 		},
 
 		onEditorSave (note) {

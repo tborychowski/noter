@@ -2,6 +2,8 @@
 	{#if folder}
 	<h2>
 		<span>{folder.name || ''}</span>
+		<div class="flex-filler"></div>
+		<button class="btn" on:click="deleteFolder(folder.id)">Delete</button>
 		<button class="btn" on:click="add()">+</button>
 	</h2>
 	<div class="scroller">
@@ -65,6 +67,12 @@ export default {
 			this.fire('select', item);
 		},
 
+		deleteFolder (id) {
+			// remove all notes from folder?
+			Data.Folders.del(id).then(res => {
+				this.fire('folder-delete');
+			});
+		}
 	}
 };
 </script>
