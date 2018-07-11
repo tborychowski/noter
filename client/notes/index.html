@@ -1,16 +1,16 @@
 <div class="notes">
-	{#if folder}
+	{#if $folder}
 	<h2>
-		<span>{folder.name || ''}</span>
+		<span>{$folder.name || ''}</span>
 		<div class="flex-filler"></div>
-		<button class="btn" on:click="deleteFolder(folder.id)">Delete</button>
+		<button class="btn" on:click="deleteFolder($folder.id)">Delete</button>
 		<button class="btn" on:click="add()">+</button>
 	</h2>
 	<div class="scroller">
 		{#each notes as item}
-		<a href="#{item.id}"
+		<a href="#"
 		class="note {isSelected(item, selected) ? 'selected' : ''}"
-		on:click="select(item)">{item.title}</a>
+		on:click="select(event, item)">{item.title}</a>
 		{/each}
 	</div>
 	{/if}
@@ -18,16 +18,28 @@
 
 
 <script>
-import Data from '../data';
+import {Data, Store} from '../data';
+
 
 export default {
 	data () {
 		return {
 			isLoading: true,
-			folder: null,
 			selected: null,
 			items: [],
 		};
+	},
+	store: () => Store,
+	oncreate () {
+		this.store.on('state', ({ current, changed }) => {
+			if (changed.folder) {
+				this.set({ selected: null });
+				this.load(current.folder);
+			}
+			if (changed.note) {
+				this.set({ selected: current.note });
+			}
+		});
 	},
 	computed: {
 		notes ({items}) {
@@ -43,10 +55,12 @@ export default {
 
 	methods: {
 		load (folder) {
-			if (!folder) return this.set({ items: [], isLoading: false, folder: null });
-			if (!this.get().items.length) this.set({ isLoading: true });
+			if (!folder) return;
+			this.set({ isLoading: !this.get().items.length, items: [] });
 			Data.Notes.get(folder.id).then(items => {
-				this.set({ items, isLoading: false, folder });
+				this.set({ items, isLoading: false });
+				const note = this.store.get().note;
+				if (note) this.select(note);
 			});
 		},
 
@@ -62,9 +76,10 @@ export default {
 					});
 		},
 
-		select (item) {
+		select (ev, item) {
+			ev.preventDefault();
 			this.set({ selected: item });
-			this.fire('select', item);
+			this.store.set({ note: item });
 		},
 
 		deleteFolder (id) {

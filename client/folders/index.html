@@ -6,16 +6,16 @@
 	<input class="inline-edit" ref:editor on:keydown="onkeydown(event)" on:blur="save()">
 	<div class="scroller" ref:list>
 		{#each folders as item}
-			<a href="#{item.id}"
-				class="folder {selected === item ? 'selected' : ''}"
-				on:click="onclick(this, item)">{item.name}</a>
+			<a href="#"
+				class="folder {isSelected(item, selected) ? 'selected' : ''}"
+				on:click="onclick(event, item)">{item.name}</a>
 		{/each}
 	</div>
 </div>
 
 
 <script>
-import Data from '../data';
+import {Data, Store} from '../data';
 
 export default {
 	data () {
@@ -26,12 +26,24 @@ export default {
 			items: [],
 		};
 	},
+	store: () => Store,
 	computed: {
 		folders ({items}) {
 			return items.sort((a, b) => a.name.localeCompare(b.name));
 		}
 	},
+	helpers: {
+		isSelected (item, selected) {
+			if (!selected || !item) return false;
+			return selected.id === item.id;
+		}
+	},
 	oncreate () {
+		this.store.on('state', ({ current, changed }) => {
+			if (changed.folder && !this.get().selected) {
+				this.set({ selected: current.folder });
+			}
+		});
 		this.load();
 	},
 
@@ -98,7 +110,7 @@ export default {
 
 		selectItem (item) {
 			this.set({ selected: item });
-			this.fire('select', item);
+			this.store.set({ folder: item, note: null });
 		},
 
 		onkeydown (e) {
@@ -107,7 +119,8 @@ export default {
 			if (key === 'Enter') return this.save();
 		},
 
-		onclick (el, item) {
+		onclick (ev, item) {
+			ev.preventDefault();
 			const selected = this.get().selected;
 			if (selected === item) return this.edit(item);
 			this.selectItem(item);

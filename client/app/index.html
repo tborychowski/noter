@@ -8,49 +8,32 @@ import Header from '../header';
 import Folders from '../folders';
 import Notes from '../notes';
 import Editor from '../editor';
+import {Store} from '../data';
+import {setUrl} from '../util';
+import {getStateFromUrl} from '../util';
+
 
 export default {
 	components: { Header, Folders, Notes, Editor },
-	data () {
-		return {
-			folder: null,
-			note: null,
-		};
-	},
+	store: () => Store,
 	oncreate () {
-		this.refs.folders.on('select', this.onFolderChange.bind(this));
-		this.refs.notes.on('select', this.onNoteChange.bind(this));
 		this.refs.notes.on('folder-delete', this.onFolderDelete.bind(this));
-		this.refs.editor.on('save', this.onEditorSave.bind(this));
-		this.refs.editor.on('note-delete', this.onNoteDelete.bind(this));
+		this.refs.editor.on('save', this.reloadNotes.bind(this));
+		this.refs.editor.on('note-delete', this.reloadNotes.bind(this));
+
+		this.store.on('state', ({ changed, current }) => setUrl(current));
+
+		const state = getStateFromUrl();
+		this.store.set(state);
 	},
 
 	methods: {
-		onFolderChange (folder) {
-			this.set({ folder });
-			this.refs.notes.load(folder);
-		},
-
 		onFolderDelete () {
-			this.set({ folder: null });
 			this.refs.folders.load();
 			this.refs.notes.load();
 		},
-
-		onNoteChange (note) {
-			this.set({ note });
-			this.refs.editor.load(note);
-		},
-
-		onNoteDelete () {
-			this.set({ note: null });
-			this.refs.notes.load(this.get().folder);
-		},
-
-		onEditorSave (note) {
-			this.set({ note });
-			this.refs.notes.load(this.get().folder);
-			this.refs.notes.select(note);
+		reloadNotes () {
+			this.refs.notes.load();
 		},
 
 	}

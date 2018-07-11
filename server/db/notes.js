@@ -1,4 +1,4 @@
-const {Note, Folder} = require('./db');
+const {Note} = require('./db');
 
 
 function getOne (id) {

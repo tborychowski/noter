@@ -1,15 +1,24 @@
-<div class="editor">
+<div class="editor {mode}">
 	{#if note}
 	<form on:submit="save(event)">
 		<h2>
-			<input bind:value="note.title" ref:title>
+			{#if mode === 'view'}
+				<span class="note-title">{note.title}</span>
+			{:else}
+				<input bind:value="note.title" ref:title>
+			{/if}
 			<div class="flex-filler"></div>
-			<button type="submit" class="btn">Save</button>
-			<button type="button" class="btn" on:click="del(note.id)">Delete</button>
-			<button type="button" class="btn">&times;</button>
+			<button type="submit" class="btn btn-save">Save</button>
+			<button type="button" class="btn btn-remove" on:click="del(note.id)">Delete</button>
+			<button type="button" class="btn btn-cancel" on:click="cancel()">Cancel</button>
+			<button type="button" class="btn btn-edit" on:click="edit(note)">Edit</button>
 		</h2>
 		<div class="scroller">
-			<textarea bind:value="note.text"></textarea>
+			{#if mode === 'view'}
+				<div class="note-text">{note.text}</div>
+			{:else}
+				<textarea bind:value="note.text"></textarea>
+			{/if}
 		</div>
 	</form>
 	{/if}
@@ -17,40 +26,61 @@
 
 
 <script>
-import Data from '../data';
+import {Data, Store} from '../data';
 
 export default {
 	data () {
 		return {
 			isLoading: true,
+			mode: 'view',
 			note: null,
 		};
 	},
-
+	store: () => Store,
+	oncreate () {
+		this.store.on('state', ({ current, previous, changed }) => {
+			if (changed.note && current.note) this.load(current.note);
+		});
+	},
 	methods: {
 		load (note) {
-			if (!note) return this.set({ note: null, isLoading: false });
-			if (!this.get().note) this.set({ isLoading: true });
+			if (!note) note = this.store.get().note;
+			else if (!this.store.get().note) this.set({ isLoading: true });
 
 			Data.Notes.getOne(note.id).then(res => {
-				this.set({ note: res, isLoading: false });
-				this.refs.title.select();
+				this.set({ isLoading: false });
+				this.set({ note: res });
 			});
+		},
+
+		edit (note) {
+			this.set({ mode: 'edit' });
+			this.refs.title.select();
+		},
+
+		cancel (note) {
+			this.set({ mode: 'view' });
 		},
 
 		save (e) {
 			e.preventDefault();
 			const note = this.get().note;
 			Data.Notes.save(note).then(res => {
+				this.cancel();
 				this.fire('save', note);
 			});
 		},
 
 		del (id) {
 			Data.Notes.del(id).then(res => {
-				this.set({ note: null });
+				this.close();
 				this.fire('note-delete');
 			});
+		},
+
+		close () {
+			this.set({ note: null });
+			this.store.set({ note: null });
 		}
 	}
 };
