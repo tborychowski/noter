@@ -1,4 +1,4 @@
-<Header></Header>
+<Header ref:header></Header>
 <Folders ref:folders></Folders>
 <Notes ref:notes></Notes>
 <Editor ref:editor></Editor>
@@ -8,7 +8,7 @@ import Header from '../header';
 import Folders from '../folders';
 import Notes from '../notes';
 import Editor from '../editor';
-import {Store} from '../data';
+import {Data, Store} from '../data';
 import {setUrl} from '../util';
 import {getStateFromUrl} from '../util';
 
@@ -17,24 +17,25 @@ export default {
 	components: { Header, Folders, Notes, Editor },
 	store: () => Store,
 	oncreate () {
-		this.refs.notes.on('folder-delete', this.onFolderDelete.bind(this));
-		this.refs.editor.on('save', this.reloadNotes.bind(this));
-		this.refs.editor.on('note-delete', this.reloadNotes.bind(this));
-
 		this.store.on('state', ({ changed, current }) => setUrl(current));
+		this.store.set(getStateFromUrl());
 
-		const state = getStateFromUrl();
-		this.store.set(state);
+		this.load();
 	},
 
 	methods: {
-		onFolderDelete () {
-			this.refs.folders.load();
-			this.refs.notes.load();
+		load () {
+			Data.Notes.get().then(notes => {
+				this.store.set({ notes });
+
+				const selectedNote = this.store.get().note;
+				if (selectedNote.id && !selectedNote.title) {
+					const note = notes.find(n => n.id === selectedNote.id);
+					this.store.set({ note });
+				}
+			});
 		},
-		reloadNotes () {
-			this.refs.notes.load();
-		},
+
 
 	}
 };

@@ -1,14 +1,12 @@
-<div class="folders {edited ? 'in-edit' : ''}">
-	<h2>
+<div class="folders">
+	<!-- <h2>
 		<span>Folders</span>
-		<button class="btn" on:click="add()">+</button>
-	</h2>
-	<input class="inline-edit" ref:editor on:keydown="onkeydown(event)" on:blur="save()">
+	</h2> -->
 	<div class="scroller" ref:list>
-		{#each folders as item}
+		{#each folders as folder}
 			<a href="#"
-				class="folder {isSelected(item, selected) ? 'selected' : ''}"
-				on:click="onclick(event, item)">{item.name}</a>
+				class="folder {folder === $folder ? 'selected' : ''}"
+				on:click="onclick(event, folder)">{folder || NO_FOLDER}</a>
 		{/each}
 	</div>
 </div>
@@ -16,114 +14,32 @@
 
 <script>
 import {Data, Store} from '../data';
-
+const NO_FOLDER = '- no folder -';
 export default {
 	data () {
-		return {
-			isLoading: true,
-			selected: null,
-			edited: null,
-			items: [],
-		};
+		return {};
 	},
 	store: () => Store,
 	computed: {
-		folders ({items}) {
-			return items.sort((a, b) => a.name.localeCompare(b.name));
+		folders ({$notes}) {
+			let folders = $notes.map(n => n.folder);
+			folders = [...new Set(folders)];
+			return folders.sort((a, b) => a.localeCompare(b));
 		}
 	},
 	helpers: {
-		isSelected (item, selected) {
-			if (!selected || !item) return false;
-			return selected.id === item.id;
-		}
+		NO_FOLDER
 	},
-	oncreate () {
-		this.store.on('state', ({ current, changed }) => {
-			if (changed.folder && !this.get().selected) {
-				this.set({ selected: current.folder });
-			}
-		});
-		this.load();
-	},
+	oncreate () {},
 
 	methods: {
-		itemToIdx (item) { return this.get().folders.findIndex(i => i === item); },
-
-		load () {
-			if (!this.get().items.length) this.set({ isLoading: true });
-			Data.Folders.get().then(items => {
-				this.set({ items, isLoading: false });
-			});
+		selectItem (folder) {
+			this.store.set({ folder, note: null });
 		},
 
-		add () {
-			const items = this.get().items;
-			const newItem = { id: null, name: 'New folder' };
-			items.unshift(newItem);
-			this.set({ items });
-			this.edit(newItem);
-		},
-
-		removeFromList (item) {
-			const items = this.get().items.filter(i => i !== item);
-			this.set({ items });
-		},
-
-		edit (item) {
-			this.set({ edited: item, selected: item });
-			this.refs.editor.value = item.name;
-			this.refs.editor.select();
-			const el = this.refs.list.querySelector('.folder.selected');
-			this.positionEditor(el);
-		},
-
-		positionEditor (el) {
-			const offset = el.getBoundingClientRect();
-			const inp = this.refs.editor;
-			inp.style.top = offset.top + 'px';
-			inp.style.left = offset.left + 'px';
-			inp.style.width = offset.width + 'px';
-			inp.style.height = offset.height + 'px';
-		},
-
-		save () {
-			const edited = this.get().edited;
-			if (!edited) return;
-			edited.name = this.refs.editor.value;
-			Data.Folders.save(edited).then(res => {
-				const items = this.get().items;
-				const idx = this.itemToIdx(edited);
-				items[idx] = edited.id ? edited : res;
-				this.set({ items });
-				this.selectItem(items[idx]);
-				this.cancelEdit();
-			});
-		},
-
-		cancelEdit () {
-			const edited = this.get().edited;
-			if (!edited.id) this.removeFromList(edited);
-			this.refs.editor.value = '';
-			this.set({ edited: null });
-		},
-
-		selectItem (item) {
-			this.set({ selected: item });
-			this.store.set({ folder: item, note: null });
-		},
-
-		onkeydown (e) {
-			const key = e.key;
-			if (key === 'Escape') return this.cancelEdit();
-			if (key === 'Enter') return this.save();
-		},
-
-		onclick (ev, item) {
+		onclick (ev, folder) {
 			ev.preventDefault();
-			const selected = this.get().selected;
-			if (selected === item) return this.edit(item);
-			this.selectItem(item);
+			this.selectItem(folder);
 		},
 
 	}

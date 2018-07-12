@@ -21,23 +21,11 @@ const save = (url, data) => {
 	return post(url, data);
 };
 
-const Folders = {
-	base: 'folders',
-	get () {
-		return get(`${this.base}`);
-	},
-	save (data) {
-		return save(this.base, data);
-	},
-	del (id) {
-		return del(`${this.base}/${id}`);
-	}
-};
 
 const Notes = {
 	base: 'notes',
-	get (folder) {
-		return get(`${this.base}?folder=${folder}`);
+	get () {
+		return get(`${this.base}`);
 	},
 	getOne (id) {
 		return get(`${this.base}/${id}`);
@@ -52,6 +40,5 @@ const Notes = {
 
 
 export default {
-	Folders,
 	Notes,
 };
