@@ -25,7 +25,7 @@ const save = (url, data) => {
 const Notes = {
 	base: 'notes',
 	get () {
-		return get(`${this.base}`);
+		return get(this.base);
 	},
 	getOne (id) {
 		return get(`${this.base}/${id}`);
