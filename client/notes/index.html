@@ -1,19 +1,15 @@
 <div class="notes">
-	{#if $folder}
-	<h2>
-		<span>{$folder.name || ''}</span>
+	<!-- <h2>
+		<span>{$folder && $folder.name || ''}</span>
 		<div class="flex-filler"></div>
-		<button class="btn" on:click="deleteFolder($folder.id)">Delete</button>
-		<button class="btn" on:click="add()">+</button>
-	</h2>
+	</h2> -->
 	<div class="scroller">
 		{#each notes as item}
 		<a href="#"
-		class="note {isSelected(item, selected) ? 'selected' : ''}"
-		on:click="select(event, item)">{item.title}</a>
+			class="note {isSelected(item, $note) ? 'selected' : ''}"
+			on:click="select(event, item)">{item.title}</a>
 		{/each}
 	</div>
-	{/if}
 </div>
 
 
@@ -23,27 +19,15 @@ import {Data, Store} from '../data';
 
 export default {
 	data () {
-		return {
-			isLoading: true,
-			selected: null,
-			items: [],
-		};
+		return {};
 	},
 	store: () => Store,
-	oncreate () {
-		this.store.on('state', ({ current, changed }) => {
-			if (changed.folder) {
-				this.set({ selected: null });
-				this.load(current.folder);
-			}
-			if (changed.note) {
-				this.set({ selected: current.note });
-			}
-		});
-	},
+	oncreate () {},
 	computed: {
-		notes ({items}) {
-			return items.sort((a, b) => a.title.localeCompare(b.title));
+		notes ({$notes, $folder}) {
+			let notes = $notes;
+			if ($folder !== null) notes = notes.filter(n => n.folder === $folder);
+			return notes.sort((a, b) => a.title.localeCompare(b.title));
 		}
 	},
 	helpers: {
@@ -54,40 +38,12 @@ export default {
 	},
 
 	methods: {
-		load (folder) {
-			if (!folder) return;
-			this.set({ isLoading: !this.get().items.length, items: [] });
-			Data.Notes.get(folder.id).then(items => {
-				this.set({ items, isLoading: false });
-				const note = this.store.get().note;
-				if (note) this.select(note);
-			});
-		},
-
-		add () {
-			const folder_id = this.get().folder.id;
-			Data.Notes
-				.save({ id: null, name: 'New note', folder_id })
-				.then(item => {
-						const items = this.get().items;
-						items.unshift(item);
-						this.set({ items });
-						this.select(item);
-					});
-		},
-
 		select (ev, item) {
 			ev.preventDefault();
 			this.set({ selected: item });
 			this.store.set({ note: item });
 		},
 
-		deleteFolder (id) {
-			// remove all notes from folder?
-			Data.Folders.del(id).then(res => {
-				this.fire('folder-delete');
-			});
-		}
 	}
 };
 </script>

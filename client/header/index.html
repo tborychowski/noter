@@ -1,19 +1,25 @@
 <header class="header">
 	<h1>NOTTER</h1>
+	<button class="btn" on:click="newNote()">New Note</button>
 	<input placeholder="search">
 </header>
 
 
 <script>
+import {Store} from '../data';
+
 export default {
 	data () {
-		return {
-		};
+		return {};
 	},
+	store: () => Store,
 	oncreate () {
 	},
 
 	methods: {
+		newNote () {
+			this.store.set({ note: { title: 'New note', text: '', folder: this.store.get().folder || '' } });
+		}
 	}
 };
 </script>

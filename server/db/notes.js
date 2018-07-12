@@ -7,12 +7,8 @@ function getOne (id) {
 
 function get (query) {
 	const where = {};
-	if (query.folder) where.folder_id = query.folder;
-	return Note.findAll({
-		order: [['title', 'ASC'], ['id', 'DESC']],
-		where,
-		// include: Folder
-	});
+	if (query.folder) where.folder = query.folder;
+	return Note.findAll({ where, order: [['title', 'ASC'], ['id', 'DESC']] });
 }
 
 // add new

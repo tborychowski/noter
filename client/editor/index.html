@@ -1,23 +1,24 @@
 <div class="editor {mode}">
-	{#if note}
+	{#if $note}
 	<form on:submit="save(event)">
 		<h2>
 			{#if mode === 'view'}
-				<span class="note-title">{note.title}</span>
+				<span class="note-title">{$note.title || ''}</span>
 			{:else}
-				<input bind:value="note.title" ref:title>
+				<input bind:value="$note.title" ref:title>
+				<input bind:value="$note.folder" placeholder="folder">
 			{/if}
 			<div class="flex-filler"></div>
 			<button type="submit" class="btn btn-save">Save</button>
-			<button type="button" class="btn btn-remove" on:click="del(note.id)">Delete</button>
+			<button type="button" class="btn btn-remove" on:click="del($note.id)">Delete</button>
 			<button type="button" class="btn btn-cancel" on:click="cancel()">Cancel</button>
-			<button type="button" class="btn btn-edit" on:click="edit(note)">Edit</button>
+			<button type="button" class="btn btn-edit" on:click="edit($note)">Edit</button>
 		</h2>
 		<div class="scroller">
 			{#if mode === 'view'}
-				<div class="note-text">{note.text}</div>
+				<div class="note-text">{$note.text || ''}</div>
 			{:else}
-				<textarea bind:value="note.text"></textarea>
+				<textarea bind:value="$note.text"></textarea>
 			{/if}
 		</div>
 	</form>
@@ -33,29 +34,20 @@ export default {
 		return {
 			isLoading: true,
 			mode: 'view',
-			note: null,
 		};
 	},
 	store: () => Store,
 	oncreate () {
 		this.store.on('state', ({ current, previous, changed }) => {
-			if (changed.note && current.note) this.load(current.note);
+			if (changed.note && current.note) {
+				if (!current.note.id && this.get().mode !== 'edit') this.edit();
+			}
 		});
 	},
 	methods: {
-		load (note) {
-			if (!note) note = this.store.get().note;
-			else if (!this.store.get().note) this.set({ isLoading: true });
-
-			Data.Notes.getOne(note.id).then(res => {
-				this.set({ isLoading: false });
-				this.set({ note: res });
-			});
-		},
-
-		edit (note) {
+		edit () {
 			this.set({ mode: 'edit' });
-			this.refs.title.select();
+			setTimeout(() => this.refs.title.select(), 100);
 		},
 
 		cancel (note) {
@@ -64,23 +56,35 @@ export default {
 
 		save (e) {
 			e.preventDefault();
-			const note = this.get().note;
+			let note = this.store.get().note;
 			Data.Notes.save(note).then(res => {
 				this.cancel();
-				this.fire('save', note);
+				if (res.id) note = res;
+				this.updateNoteInStore(note);
 			});
+		},
+
+		updateNoteInStore (note) {
+			const notes = this.store.get().notes;
+			const idx = notes.findIndex(n => n.id === note.id);
+			if (idx > -1) notes[idx] = note;
+			else notes.push(note);
+			this.store.set({ notes, note });
 		},
 
 		del (id) {
 			Data.Notes.del(id).then(res => {
 				this.close();
-				this.fire('note-delete');
+				const notes = this.store.get().notes;
+				const idx = notes.findIndex(n => n.id === id);
+				if (idx > -1) notes.splice(idx, 1);
+				this.store.set({ notes });
 			});
 		},
 
 		close () {
-			this.set({ note: null });
 			this.store.set({ note: null });
+			this.set({ mode: 'view' });
 		}
 	}
 };
