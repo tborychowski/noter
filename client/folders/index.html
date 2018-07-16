@@ -1,24 +1,16 @@
 <div class="folders">
-	<!-- <h2>
-		<span>Folders</span>
-	</h2> -->
 	<div class="scroller" ref:list>
 		{#each folders as folder}
 			<a href="#"
 				class="folder {folder === $folder ? 'selected' : ''}"
-				on:click="onclick(event, folder)">{folder || NO_FOLDER}</a>
+				on:click="onclick(event, folder)">{folder || '- no folder -'}</a>
 		{/each}
 	</div>
 </div>
 
-
 <script>
 import {Data, Store} from '../data';
-const NO_FOLDER = '- no folder -';
 export default {
-	data () {
-		return {};
-	},
 	store: () => Store,
 	computed: {
 		folders ({$notes}) {
@@ -27,21 +19,14 @@ export default {
 			return folders.sort((a, b) => a.localeCompare(b));
 		}
 	},
-	helpers: {
-		NO_FOLDER
-	},
-	oncreate () {},
-
 	methods: {
 		selectItem (folder) {
 			this.store.set({ folder, note: null });
 		},
-
 		onclick (ev, folder) {
 			ev.preventDefault();
 			this.selectItem(folder);
 		},
-
 	}
 };
 </script>

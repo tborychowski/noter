@@ -9,16 +9,15 @@
 import {Store} from '../data';
 
 export default {
-	data () {
-		return {};
-	},
 	store: () => Store,
-	oncreate () {
-	},
-
 	methods: {
 		newNote () {
-			this.store.set({ note: { title: 'New note', text: '', folder: this.store.get().folder || '' } });
+			const note = {
+				title: 'New note',
+				text: '',
+				folder: this.store.get().folder || ''
+			};
+			this.store.set({ note });
 		}
 	}
 };

@@ -1,8 +1,4 @@
 <div class="notes">
-	<!-- <h2>
-		<span>{$folder && $folder.name || ''}</span>
-		<div class="flex-filler"></div>
-	</h2> -->
 	<div class="scroller">
 		{#each notes as item}
 		<a href="#"
@@ -16,13 +12,8 @@
 <script>
 import {Data, Store} from '../data';
 
-
 export default {
-	data () {
-		return {};
-	},
 	store: () => Store,
-	oncreate () {},
 	computed: {
 		notes ({$notes, $folder}) {
 			let notes = $notes;
@@ -36,14 +27,12 @@ export default {
 			return selected.id === item.id;
 		}
 	},
-
 	methods: {
 		select (ev, item) {
 			ev.preventDefault();
 			this.set({ selected: item });
 			this.store.set({ note: item });
 		},
-
 	}
 };
 </script>
