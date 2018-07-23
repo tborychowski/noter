@@ -13,7 +13,7 @@ const fileFormat = winston.format.combine(
 
 const consoleFormat = winston.format.combine(
 	winston.format.colorize(),
-	winston.format.timestamp(),
+	winston.format.timestamp({ format: '[[]HH:mm:ss[]]' }),
 	winston.format.printf(print)
 );
 
