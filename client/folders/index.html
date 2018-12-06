@@ -1,9 +1,14 @@
 <div class="folders">
 	<div class="scroller" ref:list>
 		{#each folders as folder}
-			<a href="#"
+			<div
 				class="folder {folder === $folder ? 'selected' : ''}"
-				on:click="onclick(event, folder)">{folder || 'All Notes'}</a>
+				on:click="onclick(event, folder)"
+				on:dragover="ondragenter(event)"
+				on:dragenter="ondragenter(event)"
+				on:dragleave="ondragleave(event)"
+				on:drop="ondrop(event, folder)"
+				>{folder || 'All Notes'}</div>
 		{/each}
 	</div>
 </div>
@@ -14,9 +19,11 @@ export default {
 	store: () => Store,
 	computed: {
 		folders ({$notes}) {
-			let folders = $notes.map(n => n.folder);
+			let folders = $notes.map(n => n.folder).filter(n => !!n);
 			folders = [...new Set(folders)];
-			return folders.sort((a, b) => a.localeCompare(b));
+			folders.sort((a, b) => a.localeCompare(b));
+			folders.unshift('');
+			return folders;
 		}
 	},
 	methods: {
@@ -27,6 +34,30 @@ export default {
 			ev.preventDefault();
 			this.selectItem(folder);
 		},
+
+		ondragenter (ev) {
+			ev.preventDefault();
+			ev.target.classList.add('drag-over');
+		},
+
+		ondragleave (ev) {
+			ev.target.classList.remove('drag-over');
+		},
+
+		ondrop (ev, folder) {
+			ev.preventDefault();
+			ev.target.classList.remove('drag-over');
+
+			const itemId = +ev.dataTransfer.getData('itemId');
+			const notes = this.store.get().notes;
+			const note = notes.find(note => note.id === itemId);
+			note.folder = folder;
+
+			Data.Notes.save(note).then(res => {
+				this.store.set({ notes });
+			});
+		},
+
 	}
 };
 </script>

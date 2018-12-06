@@ -1,11 +1,14 @@
 <div class="notes">
 	<div class="scroller">
 		{#each notes as item}
-		<a href="#"
+		<div
+			draggable="true"
 			class="note {isSelected(item, $note) ? 'selected' : ''}"
-			on:click="select(event, item)">{item.title}
+			on:dragstart="ondragstart(event, item)"
+			on:click="select(event, item)">
+				{item.title}
 				<span class="pill note-folder">{item.folder}</span>
-		</a>
+		</div>
 		{/each}
 	</div>
 </div>
@@ -20,7 +23,6 @@ export default {
 		notes ({$notes, $folder}) {
 			let notes = $notes;
 			if ($folder) notes = notes.filter(n => n.folder === $folder);
-			console.log(notes);
 			return notes.sort((a, b) => a.title.localeCompare(b.title));
 		}
 	},
@@ -36,6 +38,10 @@ export default {
 			this.set({ selected: item });
 			this.store.set({ note: item });
 		},
+
+		ondragstart (ev, item) {
+			ev.dataTransfer.setData('itemId', item.id);
+		}
 	}
 };
 </script>

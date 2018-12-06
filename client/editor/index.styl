@@ -13,8 +13,19 @@
 		display flex
 		flex-flow column
 
-	h2
-		margin-bottom 0
+	.note-title
+		padding 0 10
+
+	input
+		font 16
+		margin 0
+
+		&:focus
+			outline none
+			box-shadow none
+
+	button
+		margin 0 5
 
 	textarea
 		width 100%
@@ -26,7 +37,30 @@
 		font inherit
 		resize none
 
+	label
+		width 60px
 
 	.note-text
 		white-space pre-wrap
 		padding 10
+
+
+
+.editor-header
+	display flex
+	flex-flow column
+	border-bottom color-accent
+	padding 10 10 5
+
+.editor-header-row
+	display flex
+	flex-wrap wrap
+	flex-flow row
+	align-items center
+	justify-content space-between
+	margin-bottom 5
+	width 100%
+
+.editor.view .editor-header-row.edit
+.editor.edit .editor-header-row.view
+	display none
