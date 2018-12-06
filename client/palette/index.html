@@ -5,7 +5,7 @@ import {Data, Store} from '../data';
 export default {
 	store: () => Store,
 	oncreate () {
-		const palette = new CommandPalette({
+		this.palette = new CommandPalette({
 			searchInFields: ['title', 'text'],
 			dataSrc: this.getNotes.bind(this),
 			sizeContainer: 'body',
@@ -19,7 +19,10 @@ export default {
 			}
 		});
 
-		palette.on('action', this.onNoteSelect.bind(this));
+		this.palette.on('action', this.onNoteSelect.bind(this));
+
+
+		document.addEventListener('keydown', this.onkeydown.bind(this));
 	},
 	methods: {
 		getNotes () {
@@ -28,7 +31,21 @@ export default {
 
 		onNoteSelect (note) {
 			this.store.set({ note });
+		},
+
+		onkeydown (ev) {
+			if (this.palette.state.open) return;
+
+			const key = ev.key;
+			const {note} = this.store.get();
+
+			if (note && key === 'e') this.action('start-edit');
+		},
+
+		action (action) {
+			this.fire('action', {action});
 		}
+
 	}
 };
 </script>

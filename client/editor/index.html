@@ -9,7 +9,7 @@
 			</div>
 			<div class="editor-header-row edit">
 				<label>Title:</label>
-				<input bind:value="$note.title" ref:title>
+				<input bind:value="$note.title" ref:title on:keydown="onkeydown(event)">
 				<div class="flex-filler"></div>
 				<button type="submit" class="btn btn-save success">Save</button>
 				<button type="button" class="btn btn-remove danger" on:click="del($note.id)">Delete</button>
@@ -17,19 +17,16 @@
 			</div>
 			<div class="editor-header-row edit">
 				<label>Folder:</label>
-				<input bind:value="$note.folder" placeholder="folder">
+				<input bind:value="$note.folder" placeholder="folder" on:keydown="onkeydown(event)">
 				<div class="flex-filler"></div>
 			</div>
-
-			{#if mode === 'edit'}
-			{/if}
 		</div>
 
 		<div class="scroller">
 			{#if mode === 'view'}
 				<div class="note-text">{$note.text || ''}</div>
 			{:else}
-				<textarea bind:value="$note.text"></textarea>
+				<textarea bind:value="$note.text" on:keydown="onkeydown(event)"></textarea>
 			{/if}
 		</div>
 	</form>
@@ -55,6 +52,16 @@ export default {
 		});
 	},
 	methods: {
+		onkeydown (ev) {
+			if (this.get().mode === 'edit') {
+				if (ev.key === 'Escape') {
+					this.set({ mode: 'view' });
+					ev.preventDefault();
+					ev.stopPropagation();
+				}
+			}
+		},
+
 		edit () {
 			this.set({ mode: 'edit' });
 			setTimeout(() => this.refs.title.select(), 100);

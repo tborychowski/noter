@@ -2,7 +2,7 @@
 <Folders ref:folders/>
 <Notes ref:notes/>
 <Editor ref:editor/>
-<Palette/>
+<Palette ref:palette/>
 
 <script>
 import {Data, Store} from '../data';
@@ -20,6 +20,10 @@ export default {
 	oncreate () {
 		this.store.on('state', ({ changed, current }) => setUrl(current));
 		this.store.set(getStateFromUrl());
+
+		this.refs.palette.on('action', ev => {
+			if (ev.action === 'start-edit') this.refs.editor.edit();
+		})
 
 		this.load();
 	},
