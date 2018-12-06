@@ -60,7 +60,9 @@ export default {
 			setTimeout(() => this.refs.title.select(), 100);
 		},
 
-		cancel (note) {
+		cancel () {
+			const note = this.store.get().note;
+			if (!note || !note.id) this.store.set({ note: null });
 			this.set({ mode: 'view' });
 		},
 
@@ -68,9 +70,9 @@ export default {
 			e.preventDefault();
 			let note = this.store.get().note;
 			Data.Notes.save(note).then(res => {
-				this.cancel();
 				if (res.id) note = res;
 				this.updateNoteInStore(note);
+				this.cancel();
 			});
 		},
 
