@@ -3,7 +3,9 @@
 		{#each notes as item}
 		<a href="#"
 			class="note {isSelected(item, $note) ? 'selected' : ''}"
-			on:click="select(event, item)">{item.title}</a>
+			on:click="select(event, item)">{item.title}
+				<span class="pill note-folder">{item.folder}</span>
+		</a>
 		{/each}
 	</div>
 </div>
@@ -17,7 +19,8 @@ export default {
 	computed: {
 		notes ({$notes, $folder}) {
 			let notes = $notes;
-			if ($folder !== null) notes = notes.filter(n => n.folder === $folder);
+			if ($folder) notes = notes.filter(n => n.folder === $folder);
+			console.log(notes);
 			return notes.sort((a, b) => a.title.localeCompare(b.title));
 		}
 	},

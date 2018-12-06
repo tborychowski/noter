@@ -4,8 +4,6 @@
 	grid-area notes
 	width 300px
 	transition width .2s
-	background #333
-	color #ccc
 	overflow hidden
 	display flex
 	flex-flow column
@@ -19,12 +17,21 @@
 
 		&:focus
 		&:hover
-			background-color #fff1
+			background-color color-highlight
 			outline none
 
 		&.selected
-			background-color #fff3
+			background-color color-accent
+			color color-text-dark0
+			box-shadow 0 0 1px #0008
 
+	.note-folder
+		background color-bg-dark3
+		color color-text-light2
+		float right
+
+		&:empty
+			display none
 
 @media (max-width: 600px)
 	.notes

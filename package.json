@@ -7,7 +7,7 @@
 		"url": ""
 	},
 	"scripts": {
-		"start:client": "gulp watch",
+		"start:client": "gulp client",
 		"start:server": "gulp server",
 		"dist": "gulp --prod",
 		"start": "run-p start:client start:server"

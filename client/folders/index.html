@@ -3,7 +3,7 @@
 		{#each folders as folder}
 			<a href="#"
 				class="folder {folder === $folder ? 'selected' : ''}"
-				on:click="onclick(event, folder)">{folder || '- no folder -'}</a>
+				on:click="onclick(event, folder)">{folder || 'All Notes'}</a>
 		{/each}
 	</div>
 </div>

@@ -29,7 +29,7 @@ export default {
 				this.store.set({ notes });
 
 				const selectedNote = this.store.get().note;
-				if (selectedNote.id && !selectedNote.title) {
+				if (selectedNote && selectedNote.id && !selectedNote.title) {
 					const note = notes.find(n => n.id === selectedNote.id);
 					this.store.set({ note });
 				}

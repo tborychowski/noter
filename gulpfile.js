@@ -22,13 +22,6 @@ const wpErr = (err, stats) => {
 };
 
 let serverStarted = false;
-const startServer = done =>
-	nodemon({ script: './server/index.js', watch: ['./server'], ext: 'js html' })
-		.on('start', () => {
-			if (serverStarted) return;
-			serverStarted = true;
-			setTimeout(done, 500);
-		});
 
 
 env.set({ NODE_ENV: isProd ? 'production' : 'development' });
@@ -83,11 +76,16 @@ gulp.task('styl', () => {
 
 
 gulp.task('server', done => {
-	startServer(done);
+	nodemon({ script: './server/index.js', watch: ['./server'], ext: 'js html' })
+		.on('start', () => {
+			if (serverStarted) return;
+			serverStarted = true;
+			setTimeout(done, 500);
+		});
 });
 
 
-gulp.task('watch', ['default'], () => {
+gulp.task('watch', () => {
 	if (isProd) return;
 	livereload.listen();
 	gulp.watch('client/**/*.styl', ['styl']);
@@ -97,4 +95,5 @@ gulp.task('watch', ['default'], () => {
 });
 
 
-gulp.task('default', [ 'js', 'styl', 'assets', 'eslint' ]);
+gulp.task('client', [ 'js', 'styl', 'assets', 'eslint', 'watch' ]);
+gulp.task('default', [ 'client' ]);
