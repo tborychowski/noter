@@ -1,2 +1,2 @@
 # NOTER
-A note taking app
+A [nordically](https://github.com/arcticicestudio/nord) themed note taking app.
