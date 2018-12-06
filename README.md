@@ -1,2 +1,2 @@
-# NOTTER
+# NOTER
 A note taking app
