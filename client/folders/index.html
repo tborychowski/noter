@@ -2,6 +2,7 @@
 	<div class="scroller" ref:list>
 		{#each folders as folder}
 			<div
+				tabindex="0"
 				class="folder {folder === $folder ? 'selected' : ''}"
 				on:click="onclick(event, folder)"
 				on:dragover="ondragenter(event)"

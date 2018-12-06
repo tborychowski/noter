@@ -23,6 +23,7 @@ export default {
 
 		this.refs.palette.on('action', ev => {
 			if (ev.action === 'start-edit') this.refs.editor.edit();
+			else if (ev.action === 'new-note') this.refs.header.newNote();
 		})
 
 		this.load();

@@ -4,10 +4,11 @@ import {Data, Store} from '../data';
 
 export default {
 	store: () => Store,
+
 	oncreate () {
 		this.palette = new CommandPalette({
 			searchInFields: ['title', 'text'],
-			dataSrc: this.getNotes.bind(this),
+			dataSrc: () => this.store.get().notes,
 			sizeContainer: 'body',
 			itemRenderer: ({title, text, highlighted}) => {
 				if (highlighted) {
@@ -21,14 +22,10 @@ export default {
 
 		this.palette.on('action', this.onNoteSelect.bind(this));
 
-
 		document.addEventListener('keydown', this.onkeydown.bind(this));
 	},
-	methods: {
-		getNotes () {
-			return this.store.get().notes;
-		},
 
+	methods: {
 		onNoteSelect (note) {
 			this.store.set({ note });
 		},
@@ -38,14 +35,70 @@ export default {
 
 			const key = ev.key;
 			const {note} = this.store.get();
+			const keymap = {
+				e: () => { if (note) this.action('start-edit'); },
+				n: () => this.action('new-note'),
 
-			if (note && key === 'e') this.action('start-edit');
+				j: () => this.openNote('next'),
+				k: () => this.openNote('prev'),
+				Enter: () => this.openNote('highlighted'),
+
+				ArrowUp: () => this.highlightNote('prev'),
+				ArrowDown: () => this.highlightNote('next'),
+
+				ArrowLeft: () => this.action('focus-folders'),
+				ArrowRight: () => this.action('focus-notes'),
+			};
+
+			if (keymap[key]) keymap[key]();
+		},
+
+		focusFirstFolder () {
+			document.querySelector('.folders .folder').focus();
+		},
+
+		getFocusedIndex () {
+			const activeElem = document.activeElement;
+			if (!activeElem) return 0;
+			let notes = activeElem.closest('.notes');
+			if (!notes) return 0;
+			notes = Array.from(notes.querySelectorAll('.note'));
+			const idx = notes.findIndex(n => n == activeElem);
+			return idx || 0;
+
+		},
+
+		highlightNote (whichNote) {
+			if (!document.activeElement) return this.focusFirstFolder();
+			const activeElem = document.activeElement;
+			const isFolder = !!activeElem.closest('.folders');
+			const isNote = !!activeElem.closest('.notes');
+			if (!isFolder && !isNote) return this.focusFirstFolder();
+
+			let newElem;
+			if (whichNote === 'prev') newElem = activeElem.previousSibling;
+			else if (whichNote === 'next') newElem = activeElem.nextSibling;
+
+			if (newElem) newElem.focus();
+		},
+
+		openNote (whichNote) {
+			let {folder, note, notesInFolder} = this.store.get();
+			let idx = null;
+			if (note) idx = notesInFolder.findIndex(n => n == note);
+
+			if (idx === null) idx = 0;
+			else if (whichNote === 'next' && idx < notesInFolder.length - 1) idx += 1;
+			else if (whichNote === 'prev' && idx > 0) idx -= 1;
+			else if (whichNote === 'highlighted') idx = this.getFocusedIndex();
+
+			note = notesInFolder[idx];
+			this.store.set({ note });
 		},
 
 		action (action) {
-			this.fire('action', {action});
+			this.fire('action', { action });
 		}
-
 	}
 };
 </script>

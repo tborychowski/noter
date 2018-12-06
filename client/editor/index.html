@@ -55,9 +55,9 @@ export default {
 		onkeydown (ev) {
 			if (this.get().mode === 'edit') {
 				if (ev.key === 'Escape') {
-					this.set({ mode: 'view' });
 					ev.preventDefault();
 					ev.stopPropagation();
+					this.cancel();
 				}
 			}
 		},

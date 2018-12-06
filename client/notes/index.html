@@ -1,8 +1,9 @@
 <div class="notes">
 	<div class="scroller">
-		{#each notes as item}
+		{#each $notesInFolder as item}
 		<div
 			draggable="true"
+			tabindex="0"
 			class="note {isSelected(item, $note) ? 'selected' : ''}"
 			on:dragstart="ondragstart(event, item)"
 			on:click="select(event, item)">
@@ -19,13 +20,6 @@ import {Data, Store} from '../data';
 
 export default {
 	store: () => Store,
-	computed: {
-		notes ({$notes, $folder}) {
-			let notes = $notes;
-			if ($folder) notes = notes.filter(n => n.folder === $folder);
-			return notes.sort((a, b) => a.title.localeCompare(b.title));
-		}
-	},
 	helpers: {
 		isSelected (item, selected) {
 			if (!selected || !item) return false;
