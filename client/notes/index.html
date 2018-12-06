@@ -35,7 +35,6 @@ export default {
 	methods: {
 		select (ev, item) {
 			ev.preventDefault();
-			this.set({ selected: item });
 			this.store.set({ note: item });
 		},
 

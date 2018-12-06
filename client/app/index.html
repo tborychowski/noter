@@ -1,20 +1,21 @@
-<Header ref:header></Header>
-<Folders ref:folders></Folders>
-<Notes ref:notes></Notes>
-<Editor ref:editor></Editor>
+<Header ref:header/>
+<Folders ref:folders/>
+<Notes ref:notes/>
+<Editor ref:editor/>
+<Palette/>
 
 <script>
-import Header from '../header';
-import Folders from '../folders';
-import Notes from '../notes';
-import Editor from '../editor';
 import {Data, Store} from '../data';
-import {setUrl} from '../util';
-import {getStateFromUrl} from '../util';
-
+import {setUrl, getStateFromUrl} from '../util';
 
 export default {
-	components: { Header, Folders, Notes, Editor },
+	components: {
+		Header: '../header',
+		Folders: '../folders',
+		Notes: '../notes',
+		Editor: '../editor',
+		Palette: '../palette',
+	},
 	store: () => Store,
 	oncreate () {
 		this.store.on('state', ({ changed, current }) => setUrl(current));

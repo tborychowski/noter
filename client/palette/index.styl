@@ -1,0 +1,75 @@
+@require 'lib'
+
+.command-palette
+	flex 1
+	flex-wrap wrap
+	min-width 200px
+	max-width 80%
+	position fixed
+	left 20%
+	right 20%
+	top 15%
+	border-radius 3px
+	display flex
+	overflow hidden
+	box-shadow 0 5px 50px 5px #0008
+	background color-bg-dark0
+
+	&.hidden
+		display none
+
+.command-palette *
+	box-sizing border-box
+
+.command-palette-input
+	font inherit
+	font-size 18px
+	width 100%
+	border none
+	padding 25px 17px
+	margin 0
+	outline none
+	background none
+	border-radius 4px 4px 0 0
+
+	&:focus
+		box-shadow none
+		border-color transparent
+
+
+.command-palette-list
+	position relative
+	width 100%
+	overflow-y auto
+	z-index 99
+	padding 0
+	border-top 1px solid color-accent
+
+
+.command-palette-list-item
+	padding 10px 20px
+	color color-text-light2
+	cursor pointer
+	font-size 15px
+	line-height 1.6
+
+
+.item-name
+	color color-text-light3
+
+.item-sub
+	display block
+	color darken(color-text-light2, 30%)
+	font-size 0.9em
+	white-space nowrap
+	overflow hidden
+	text-overflow ellipsis
+
+
+.command-palette-list-item:hover
+.command-palette-list-item.selected
+	background-color color-highlight
+	color color-text-light2
+
+
+
