@@ -4,6 +4,7 @@ const store = new Store({
 	notes: [],
 	folder: '',
 	note: null,
+	mode: 'view',
 });
 
 

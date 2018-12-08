@@ -1,4 +1,4 @@
-<div class="editor {mode}">
+<div class="editor {$mode}">
 	{#if $note}
 	<form on:submit="save(event)">
 		<div class="editor-header">
@@ -23,7 +23,7 @@
 		</div>
 
 		<div class="scroller">
-			{#if mode === 'view'}
+			{#if $mode === 'view'}
 				<div class="note-text">{$note.text || ''}</div>
 			{:else}
 				<textarea bind:value="$note.text" on:keydown="onkeydown(event)"></textarea>
@@ -38,22 +38,17 @@
 import {Data, Store} from '../data';
 
 export default {
-	data () {
-		return {
-			mode: 'view',
-		};
-	},
 	store: () => Store,
 	oncreate () {
 		this.store.on('state', ({ current, previous, changed }) => {
 			if (changed.note && current.note) {
-				if (!current.note.id && this.get().mode !== 'edit') this.edit();
+				if (!current.note.id && this.store.get().mode !== 'edit') this.edit();
 			}
 		});
 	},
 	methods: {
 		onkeydown (ev) {
-			if (this.get().mode === 'edit') {
+			if (this.store.get().mode === 'edit') {
 				if (ev.key === 'Escape') {
 					ev.preventDefault();
 					ev.stopPropagation();
@@ -63,14 +58,18 @@ export default {
 		},
 
 		edit () {
-			this.set({ mode: 'edit' });
-			setTimeout(() => this.refs.title.select(), 100);
+			const mode = this.store.get().mode;
+			if (mode === 'view') {
+				this.store.set({ mode: 'edit' });
+				setTimeout(() => this.refs.title.select(), 100);
+			}
 		},
 
 		cancel () {
 			const note = this.store.get().note;
 			if (!note || !note.id) this.store.set({ note: null });
-			this.set({ mode: 'view' });
+			this.store.set({ mode: 'view' });
+			document.querySelector('.notes .note.selected').focus();
 		},
 
 		save (e) {
@@ -102,8 +101,7 @@ export default {
 		},
 
 		close () {
-			this.store.set({ note: null });
-			this.set({ mode: 'view' });
+			this.store.set({ mode: 'view', note: null });
 		}
 	}
 };

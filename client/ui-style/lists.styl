@@ -1,0 +1,38 @@
+@import "lib"
+
+.list
+	transition width .2s
+	overflow hidden
+	display flex
+	flex-flow column
+	position relative
+
+	.list-item
+		padding 10
+		user-select none
+
+		&.selected
+			background-color color-accent
+			color color-text-dark0
+			box-shadow 0 0 1px #0008
+
+		&:focus
+			outline none
+			box-shadow 0 0 0 3px color-highlight inset
+
+
+	.list-item-badge
+		background color-bg-dark3
+		color color-text-light2
+		float right
+		border-radius 10px
+		font-weight normal
+		font-size .8em
+		line-height 1
+		padding 2 8 3
+		white-space nowrap
+
+		&:empty
+			display none
+
+

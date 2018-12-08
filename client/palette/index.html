@@ -33,67 +33,37 @@ export default {
 		onkeydown (ev) {
 			if (this.palette.state.open) return;
 
-			const key = ev.key;
 			const {note} = this.store.get();
+			const isEdit = (this.store.get().mode === 'edit');
+			const editNote = () => { if (note) this.action('start-edit'); };
+
 			const keymap = {
-				e: () => { if (note) this.action('start-edit'); },
+				e: editNote,
+				Enter: editNote,
 				n: () => this.action('new-note'),
-
-				j: () => this.openNote('next'),
-				k: () => this.openNote('prev'),
-				Enter: () => this.openNote('highlighted'),
-
-				ArrowUp: () => this.highlightNote('prev'),
-				ArrowDown: () => this.highlightNote('next'),
-
-				ArrowLeft: () => this.action('focus-folders'),
-				ArrowRight: () => this.action('focus-notes'),
+				ArrowUp: () => this.goto('up'),
+				ArrowDown: () => this.goto('down'),
+				ArrowRight: () => this.goto('notes'),
+				ArrowLeft: () => this.goto('folders'),
 			};
 
-			if (keymap[key]) keymap[key]();
+			if (keymap[ev.key] && !isEdit) keymap[ev.key]();
 		},
 
-		focusFirstFolder () {
-			document.querySelector('.folders .folder').focus();
-		},
+		goto (where) {
+			if (where === 'folders') return document.querySelector('.folders .folder.selected').focus();
+			if (where === 'notes') return document.querySelector('.notes .note').focus();
+			if (where === 'up' || where === 'down') {
+				const elem = document.activeElement;
+				const isList = elem && elem.closest('.list');
+				if (!isList) return document.querySelector('.notes .note').focus();
 
-		getFocusedIndex () {
-			const activeElem = document.activeElement;
-			if (!activeElem) return 0;
-			let notes = activeElem.closest('.notes');
-			if (!notes) return 0;
-			notes = Array.from(notes.querySelectorAll('.note'));
-			const idx = notes.findIndex(n => n == activeElem);
-			return idx || 0;
+				let newElem;
+				if (where === 'up') newElem = elem.previousElementSibling;
+				else if (where === 'down') newElem = elem.nextElementSibling;
 
-		},
-
-		highlightNote (whichNote) {
-			if (!document.activeElement) return this.focusFirstFolder();
-			const activeElem = document.activeElement;
-			const isFolder = !!activeElem.closest('.folders');
-			const isNote = !!activeElem.closest('.notes');
-			if (!isFolder && !isNote) return this.focusFirstFolder();
-
-			let newElem;
-			if (whichNote === 'prev') newElem = activeElem.previousSibling;
-			else if (whichNote === 'next') newElem = activeElem.nextSibling;
-
-			if (newElem) newElem.focus();
-		},
-
-		openNote (whichNote) {
-			let {folder, note, notesInFolder} = this.store.get();
-			let idx = null;
-			if (note) idx = notesInFolder.findIndex(n => n == note);
-
-			if (idx === null) idx = 0;
-			else if (whichNote === 'next' && idx < notesInFolder.length - 1) idx += 1;
-			else if (whichNote === 'prev' && idx > 0) idx -= 1;
-			else if (whichNote === 'highlighted') idx = this.getFocusedIndex();
-
-			note = notesInFolder[idx];
-			this.store.set({ note });
+				if (newElem && newElem.matches('.list-item')) newElem.focus();
+			}
 		},
 
 		action (action) {

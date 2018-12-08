@@ -1,14 +1,15 @@
-<div class="notes">
+<div class="list notes">
 	<div class="scroller">
 		{#each $notesInFolder as item}
 		<div
+			class="list-item note {isSelected(item, $note) ? 'selected' : ''}"
 			draggable="true"
 			tabindex="0"
-			class="note {isSelected(item, $note) ? 'selected' : ''}"
+			on:focus="open(item)"
 			on:dragstart="ondragstart(event, item)"
 			on:click="select(event, item)">
 				{item.title}
-				<span class="pill note-folder">{item.folder}</span>
+				<span class="list-item-badge  pill">{item.folder}</span>
 		</div>
 		{/each}
 	</div>
@@ -34,6 +35,10 @@ export default {
 
 		ondragstart (ev, item) {
 			ev.dataTransfer.setData('itemId', item.id);
+		},
+
+		open (note) {
+			this.store.set({ note, mode: 'view' });
 		}
 	}
 };

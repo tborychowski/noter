@@ -1,9 +1,10 @@
-<div class="folders">
+<div class="list folders">
 	<div class="scroller" ref:list>
 		{#each folders as folder}
 			<div
 				tabindex="0"
-				class="folder {folder === $folder ? 'selected' : ''}"
+				class="list-item folder {folder === $folder ? 'selected' : ''}"
+				on:focus="open(folder)"
 				on:click="onclick(event, folder)"
 				on:dragover="ondragenter(event)"
 				on:dragenter="ondragenter(event)"
@@ -28,12 +29,12 @@ export default {
 		}
 	},
 	methods: {
-		selectItem (folder) {
-			this.store.set({ folder, note: null });
+		open (folder) {
+			this.store.set({ folder, note: null, mode: 'view' });
 		},
 		onclick (ev, folder) {
 			ev.preventDefault();
-			this.selectItem(folder);
+			this.open(folder);
 		},
 
 		ondragenter (ev) {
