@@ -27,7 +27,7 @@ export default {
 
 	methods: {
 		onNoteSelect (note) {
-			this.store.set({ note });
+			this.store.set({ note, folder: '' });
 		},
 
 		onkeydown (ev) {
