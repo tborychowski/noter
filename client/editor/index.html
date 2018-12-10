@@ -5,15 +5,15 @@
 			<div class="editor-header-row view">
 				<span class="note-title">{$note.title || ''}</span>
 				<div class="flex-filler"></div>
-				<button type="button" class="btn btn-edit" on:click="edit($note)">Edit</button>
+				<button type="button" class="btn-icon ion-md-create btn-edit" on:click="edit($note)" title="Edit (e)"></button>
 			</div>
 			<div class="editor-header-row edit">
 				<label>Title:</label>
 				<input bind:value="$note.title" ref:title on:keydown="onkeydown(event)">
 				<div class="flex-filler"></div>
-				<button type="submit" class="btn btn-save success">Save</button>
-				<button type="button" class="btn btn-remove danger" on:click="del($note.id)">Delete</button>
-				<button type="button" class="btn btn-cancel" on:click="cancel()">Cancel</button>
+				<button type="submit" class="btn-icon ion-md-checkmark btn-save success" title="Save (Enter)"></button>
+				<button type="button" class="btn-icon ion-md-trash btn-remove danger" on:click="del($note.id)" title="Delete"></button>
+				<button type="button" class="btn-icon ion-md-close btn-cancel" on:click="cancel()" title="Cancel (Esc)"></button>
 			</div>
 			<div class="editor-header-row edit">
 				<label>Folder:</label>

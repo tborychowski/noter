@@ -26,6 +26,10 @@ export default {
 	},
 
 	methods: {
+		show ()  {
+			this.palette.open();
+		},
+
 		onNoteSelect (note) {
 			this.store.set({ note, folder: '' });
 		},

@@ -1,6 +1,8 @@
 <header class="header">
 	<h1>NOTES</h1>
-	<button class="btn" on:click="newNote()">New Note</button>
+	<div class="flex-filler"></div>
+	<button class="btn-icon-big ion-ios-add" on:click="newNote()" title="New note (n)"></button>
+	<button class="btn-icon-big ion-ios-menu" on:click="showPalette()" title="Show palette (cmd+p)"></button>
 </header>
 
 
@@ -17,7 +19,11 @@ export default {
 				folder: this.store.get().folder || ''
 			};
 			this.store.set({ note });
-		}
+		},
+
+		showPalette () {
+			this.fire('action', { action: 'palette-show' });
+		},
 	}
 };
 </script>

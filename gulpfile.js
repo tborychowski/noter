@@ -42,7 +42,10 @@ gulp.task('eslint', () => {
 
 
 gulp.task('assets', () => {
-	gulp.src(['assets/*.*']).pipe(gulp.dest(`${PUBLIC_PATH}`));
+	gulp.src(['assets/*.*']).pipe(gulp.dest(PUBLIC_PATH));
+
+	gulp.src(['node_modules/ionicons/dist/css/*.css']).pipe(gulp.dest(`${PUBLIC_PATH}css`));
+	gulp.src(['node_modules/ionicons/dist/fonts/*.*']).pipe(gulp.dest(`${PUBLIC_PATH}fonts`));
 });
 
 
@@ -70,7 +73,7 @@ gulp.task('styl', () => {
 		.pipe(isProd ? cssmin({ keepSpecialComments: 0 }) : noop())
 		.pipe(concat('app.css'))
 		.pipe(isProd ? noop() : sourcemaps.write())
-		.pipe(gulp.dest(PUBLIC_PATH))
+		.pipe(gulp.dest(`${PUBLIC_PATH}css`))
 		.pipe(livereload());
 });
 

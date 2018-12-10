@@ -30,20 +30,6 @@ button::-moz-focus-inner
 	color color-text-light2
 
 
-
-	// default
-	// border-color lighten(color-default, 20%)
-	// border-bottom-color lighten(color-default, 10%)
-	// background color-default
-
-	// &:focus
-	// 	outline none
-	// 	box-shadow 0 0 1px lighten(color-default, 50%)
-
-	// &:active
-	// 	background darken(color-default, 15%)
-	// 	color darken(color-text-light2, 40%)
-
 	// &.info
 	border-color lighten(color-info, 20%)
 	border-bottom-color lighten(color-info, 10%)
@@ -110,3 +96,45 @@ button::-moz-focus-inner
 	&:hover
 		border-color darken(color-default, 15%)
 		color darken(color-text-light2, 40%)
+
+
+
+
+
+.btn-icon
+.btn-icon-big
+	background none
+	border-radius 50%
+	font-size 20px
+	line-height 20px
+	size 30px
+	margin 0 5
+	color color-accent
+	border color-accent
+
+	&-big
+		size 38px
+		font-size  28px
+
+
+	&.success
+		border-color color-success
+		color color-success
+	&.warning
+		border-color color-warning
+		color color-warning
+	&.danger
+		border-color color-danger
+		color color-danger
+
+	&:focus
+	&:hover
+		outline none
+		border-color color-text-light0
+		color color-text-light0
+
+	&:active
+		border-color color-text-dark0
+		color color-text-dark0
+
+
