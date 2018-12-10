@@ -32,7 +32,6 @@
 		height 100%
 		border-radius 0
 		margin 0
-		border none
 		padding 10
 		font inherit
 		resize none
@@ -50,6 +49,9 @@
 		background color-bg-dark0
 		padding 10
 		border-radius 4px
+		overflow-x auto
+		// white-space pre-wrap
+		// word-break break-all
 
 	.note-title
 		padding 0 10
@@ -65,6 +67,9 @@
 	flex-flow column
 	border-bottom color-accent
 	padding 10 10 5
+
+	.edit &
+		border-bottom none
 
 .editor-header-row
 	display flex

@@ -3,14 +3,15 @@
 		{#each folders as folder}
 			<div
 				tabindex="0"
-				class="list-item folder {folder === $folder ? 'selected' : ''}"
-				on:focus="open(folder)"
-				on:click="onclick(event, folder)"
+				class="list-item folder {folder.name === $folder ? 'selected' : ''}"
+				on:focus="open(folder.name)"
 				on:dragover="ondragenter(event)"
 				on:dragenter="ondragenter(event)"
 				on:dragleave="ondragleave(event)"
-				on:drop="ondrop(event, folder)"
-				>{folder || 'All Notes'}</div>
+				on:drop="ondrop(event, folder.name)">
+					{folder.name || 'All Notes'}
+					<span class="list-item-badge pill">{folder.count}</span>
+				</div>
 		{/each}
 	</div>
 </div>
@@ -21,10 +22,16 @@ export default {
 	store: () => Store,
 	computed: {
 		folders ({$notes}) {
-			let folders = $notes.map(n => n.folder).filter(n => !!n);
-			folders = [...new Set(folders)];
-			folders.sort((a, b) => a.localeCompare(b));
-			folders.unshift('');
+			const map = {};
+			const folders = [];
+
+			for (let note of $notes) {
+				if (note.folder) map[note.folder] = (map[note.folder] || 0) + 1;
+			}
+			for (let name in map) folders.push({ name, count: map[name] });
+			folders.sort((a, b) => a.name.localeCompare(b.name));
+			folders.unshift({ name: '', count: $notes.length });
+
 			return folders;
 		}
 	},

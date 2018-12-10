@@ -6,10 +6,9 @@
 			draggable="true"
 			tabindex="0"
 			on:focus="open(null, item)"
-			on:dragstart="ondragstart(event, item)"
-			on:click="open(event, item)">
+			on:dragstart="ondragstart(event, item)">
 				{item.title}
-				<span class="list-item-badge  pill">{item.folder}</span>
+				<span class="list-item-badge pill">{item.folder}</span>
 		</div>
 		{/each}
 	</div>
