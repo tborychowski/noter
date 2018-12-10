@@ -32,6 +32,7 @@ export default {
 
 		onNoteSelect (note) {
 			this.store.set({ note, folder: '' });
+			setTimeout(() => document.querySelector('.notes .note.selected').focus(), 10);
 		},
 
 		onkeydown (ev) {
