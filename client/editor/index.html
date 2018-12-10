@@ -18,7 +18,7 @@
 				<button type="button" class="btn-icon ion-md-close btn-cancel" on:click="cancel()" title="Cancel (Esc)"></button>
 			</div>
 			<div class="editor-header-row edit">
-				<input class="input-wide" bind:value="note.title" ref:title on:keydown="onkeydown(event)" placeholder="Title">
+				<input class="input-wide" bind:value="note.title" ref:title on:keydown="onkeydown(event)" placeholder="New note">
 			</div>
 		</div>
 
@@ -57,6 +57,9 @@ export default {
 					ev.stopPropagation();
 					this.cancel();
 				}
+				else if (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey)) {
+					this.save();
+				}
 			}
 		},
 
@@ -79,7 +82,7 @@ export default {
 		},
 
 		save (e) {
-			e.preventDefault();
+			if (e) e.preventDefault();
 			let note = this.get().note;
 			Data.Notes.save(note).then(res => {
 				if (res.id) note = res;
