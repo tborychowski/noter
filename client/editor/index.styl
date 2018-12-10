@@ -24,6 +24,9 @@
 			outline none
 			box-shadow none
 
+		&.input-wide
+			flex 1
+
 	button
 		margin 0 5
 
@@ -58,8 +61,10 @@
 	flex-flow row
 	align-items center
 	justify-content space-between
-	margin-bottom 5
 	width 100%
+
+	&.edit+&.edit
+		margin 15 0 5
 
 .editor.view .editor-header-row.edit
 .editor.edit .editor-header-row.view

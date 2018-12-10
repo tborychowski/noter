@@ -8,17 +8,17 @@
 				<button type="button" class="btn-icon ion-md-create btn-edit" on:click="edit($note)" title="Edit (e)"></button>
 			</div>
 			<div class="editor-header-row edit">
-				<label>Title:</label>
-				<input bind:value="$note.title" ref:title on:keydown="onkeydown(event)">
+				<label>Folder:</label>
+				<input bind:value="note.folder" placeholder="folder" on:keydown="onkeydown(event)">
 				<div class="flex-filler"></div>
 				<button type="submit" class="btn-icon ion-md-checkmark btn-save success" title="Save (Enter)"></button>
-				<button type="button" class="btn-icon ion-md-trash btn-remove danger" on:click="del($note.id)" title="Delete"></button>
+				{#if note.id}
+				<button type="button" class="btn-icon ion-md-trash btn-remove danger" on:click="del(note.id)" title="Delete"></button>
+				{/if}
 				<button type="button" class="btn-icon ion-md-close btn-cancel" on:click="cancel()" title="Cancel (Esc)"></button>
 			</div>
 			<div class="editor-header-row edit">
-				<label>Folder:</label>
-				<input bind:value="$note.folder" placeholder="folder" on:keydown="onkeydown(event)">
-				<div class="flex-filler"></div>
+				<input class="input-wide" bind:value="note.title" ref:title on:keydown="onkeydown(event)" placeholder="Title">
 			</div>
 		</div>
 
@@ -26,7 +26,7 @@
 			{#if $mode === 'view'}
 				<div class="note-text">{$note.text || ''}</div>
 			{:else}
-				<textarea bind:value="$note.text" on:keydown="onkeydown(event)"></textarea>
+				<textarea bind:value="note.text" on:keydown="onkeydown(event)"></textarea>
 			{/if}
 		</div>
 	</form>
@@ -39,10 +39,13 @@ import {Data, Store} from '../data';
 
 export default {
 	store: () => Store,
+	data () {
+		return { note: {} }
+	},
 	oncreate () {
 		this.store.on('state', ({ current, previous, changed }) => {
 			if (changed.note && current.note) {
-				if (!current.note.id && this.store.get().mode !== 'edit') this.edit();
+				if (!current.note.id) this.edit();
 			}
 		});
 	},
@@ -58,23 +61,26 @@ export default {
 		},
 
 		edit () {
-			const mode = this.store.get().mode;
-			if (mode === 'view') {
+			const {mode, note} = this.store.get();
+			if (mode !== 'edit') {
 				this.store.set({ mode: 'edit' });
+				this.set({ note: Object.assign({}, note) });
 				setTimeout(() => this.refs.title.select(), 100);
 			}
 		},
 
 		cancel () {
-			const note = this.store.get().note;
-			if (!note || !note.id) this.store.set({ note: null });
+			const note = this.get().note;
+			const noNote = (!note || !note.id);
 			this.store.set({ mode: 'view' });
-			document.querySelector('.notes .note.selected').focus();
+
+			if (noNote) this.store.set({ note: null });
+			else document.querySelector('.notes .note.selected').focus();
 		},
 
 		save (e) {
 			e.preventDefault();
-			let note = this.store.get().note;
+			let note = this.get().note;
 			Data.Notes.save(note).then(res => {
 				if (res.id) note = res;
 				this.updateNoteInStore(note);
@@ -91,13 +97,15 @@ export default {
 		},
 
 		del (id) {
-			Data.Notes.del(id).then(res => {
-				this.close();
-				const notes = this.store.get().notes;
-				const idx = notes.findIndex(n => n.id === id);
-				if (idx > -1) notes.splice(idx, 1);
-				this.store.set({ notes });
-			});
+			const notes = this.store.get().notes;
+			const idx = notes.findIndex(n => n.id === id);
+			if (window.confirm(`Are you sure you wish to delete "${notes[idx].title}"`)) {
+				Data.Notes.del(id).then(res => {
+					this.close();
+					if (idx > -1) notes.splice(idx, 1);
+					this.store.set({ notes });
+				});
+			}
 		},
 
 		close () {
