@@ -13,9 +13,6 @@
 		display flex
 		flex-flow column
 
-	.note-title
-		padding 0 10
-
 	input
 		font 16
 		margin 0
@@ -43,10 +40,24 @@
 	label
 		width 60px
 
-	.note-text
-		white-space pre-wrap
-		padding 10
+	a
+		color color-link0
 
+		&:hover
+			color color-link2
+
+	pre
+		background color-bg-dark0
+		padding 10
+		border-radius 4px
+
+	.note-title
+		padding 0 10
+		font-size 28px
+		font-weight 100
+
+	.note-text
+		padding 20
 
 
 .editor-header

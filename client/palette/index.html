@@ -40,10 +40,12 @@ export default {
 			const {note} = this.store.get();
 			const isEdit = (this.store.get().mode === 'edit');
 			const editNote = () => { if (note) this.action('start-edit'); };
+			const delNote = () => { if (ev.metaKey || ev.ctrlKey) this.action('del-note'); };
 
 			const keymap = {
 				e: editNote,
 				Enter: editNote,
+				Backspace: delNote,
 				n: () => this.action('new-note'),
 				ArrowUp: () => this.goto('up'),
 				ArrowDown: () => this.goto('down'),

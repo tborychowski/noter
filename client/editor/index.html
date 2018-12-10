@@ -1,11 +1,11 @@
 <div class="editor {$mode}">
-	{#if $note}
+	{#if $markedNote}
 	<form on:submit="save(event)">
 		<div class="editor-header">
 			<div class="editor-header-row view">
-				<span class="note-title">{$note.title || ''}</span>
+				<span class="note-title">{$markedNote.title || ''}</span>
 				<div class="flex-filler"></div>
-				<button type="button" class="btn-icon ion-md-create btn-edit" on:click="edit($note)" title="Edit (e)"></button>
+				<button type="button" class="btn-icon ion-md-create btn-edit" on:click="edit($markedNote)" title="Edit (e)"></button>
 			</div>
 			<div class="editor-header-row edit">
 				<label>Folder:</label>
@@ -24,7 +24,7 @@
 
 		<div class="scroller">
 			{#if $mode === 'view'}
-				<div class="note-text">{$note.text || ''}</div>
+				<div class="note-text">{@html $markedNote.markedText || ''}</div>
 			{:else}
 				<textarea bind:value="note.text" on:keydown="onkeydown(event)"></textarea>
 			{/if}
@@ -85,6 +85,7 @@ export default {
 				if (res.id) note = res;
 				this.updateNoteInStore(note);
 				this.cancel();
+				this.store.set({ note, folder: '' });
 			});
 		},
 
@@ -97,6 +98,8 @@ export default {
 		},
 
 		del (id) {
+			if (!id) id = this.store.get().note.id;
+			if (!id) return;
 			const notes = this.store.get().notes;
 			const idx = notes.findIndex(n => n.id === id);
 			if (window.confirm(`Are you sure you wish to delete "${notes[idx].title}"`)) {

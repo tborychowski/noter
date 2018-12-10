@@ -22,8 +22,9 @@ export default {
 		this.store.set(getStateFromUrl());
 
 		this.refs.palette.on('action', ev => {
-			if (ev.action === 'start-edit') this.refs.editor.edit();
-			else if (ev.action === 'new-note') this.refs.header.newNote();
+			if (ev.action === 'new-note') this.refs.header.newNote();
+			else if (ev.action === 'start-edit') this.refs.editor.edit();
+			else if (ev.action === 'del-note') this.refs.editor.del();
 		});
 
 		this.refs.header.on('action', ev => {
