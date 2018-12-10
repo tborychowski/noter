@@ -30,7 +30,8 @@ export default {
 	},
 	methods: {
 		open (folder) {
-			this.store.set({ folder, note: null, mode: 'view' });
+			if (this.store.get().mode === 'view') this.store.set({ folder, note: null });
+			else document.querySelector('.note-title-input').select();
 		},
 		onclick (ev, folder) {
 			ev.preventDefault();

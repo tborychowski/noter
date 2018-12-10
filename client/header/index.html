@@ -1,7 +1,7 @@
 <header class="header">
 	<h1>NOTES</h1>
 	<div class="flex-filler"></div>
-	<button class="btn-icon-big ion-md-add" on:click="newNote()" title="New note (n)"></button>
+	<button class="btn-icon-big ion-md-add" on:click="newNote()" on:focus="checkEditMode()" title="New note (n)"></button>
 	<button class="btn-icon-big ion-md-more" on:click="showPalette()" title="Show palette (cmd+p)"></button>
 </header>
 
@@ -12,7 +12,13 @@ import {Store} from '../data';
 export default {
 	store: () => Store,
 	methods: {
+		checkEditMode () {
+			if (this.store.get().mode !== 'view') document.querySelector('.note-folder-input').select();
+		},
+
 		newNote () {
+			if (this.store.get().mode !== 'view') return document.querySelector('.note-folder-input').select();
+
 			const note = {
 				title: '',
 				text: '',

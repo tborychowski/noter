@@ -5,9 +5,9 @@
 			class="list-item note {isSelected(item, $note) ? 'selected' : ''}"
 			draggable="true"
 			tabindex="0"
-			on:focus="open(item)"
+			on:focus="open(null, item)"
 			on:dragstart="ondragstart(event, item)"
-			on:click="select(event, item)">
+			on:click="open(event, item)">
 				{item.title}
 				<span class="list-item-badge  pill">{item.folder}</span>
 		</div>
@@ -28,17 +28,14 @@ export default {
 		}
 	},
 	methods: {
-		select (ev, item) {
-			ev.preventDefault();
-			this.store.set({ note: item });
-		},
-
 		ondragstart (ev, item) {
 			ev.dataTransfer.setData('itemId', item.id);
 		},
 
-		open (note) {
-			this.store.set({ note, mode: 'view' });
+		open (ev, note) {
+			if (ev) ev.preventDefault();
+			if (this.store.get().mode === 'view') this.store.set({ note });
+			else document.querySelector('.note-title-input').select();
 		}
 	}
 };
