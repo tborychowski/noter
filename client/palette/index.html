@@ -3,29 +3,35 @@ import CommandPalette from './command-palette';
 import {Store, EVENT} from '../data';
 import {timeAgo} from '../util';
 
+function itemRenderer ({title, text, folder, updated_at, highlighted}) {
+	if (highlighted) {
+		if (highlighted.title) title = highlighted.title;
+		if (highlighted.text) text = highlighted.text;
+		if (highlighted.folder) folder = highlighted.folder;
+	}
+	return `<div class="item-name">
+			${title}
+			<span class="pill">${folder}</span>
+			<span class="pill">updated: ${timeAgo(updated_at)}</span>
+		</div>
+		<span class="item-sub">${text}</span>`;
+}
+
+
 export default {
 	store: () => Store,
 	oncreate () {
 		this.palette = new CommandPalette({
 			searchInFields: ['title', 'folder', 'text'],
 			dataSrc: () => this.store.get().notes,
-			sizeContainer: 'body',
-			itemRenderer: ({title, text, folder, updated_at, highlighted}) => {
-				if (highlighted) {
-					if (highlighted.title) title = highlighted.title;
-					if (highlighted.text) text = highlighted.text;
-					if (highlighted.folder) folder = highlighted.folder;
-				}
-				return `<div class="item-name">
-						${title}
-						<span class="pill">${folder}</span>
-						<span class="pill">updated: ${timeAgo(updated_at)}</span>
-					</div>
-					<span class="item-sub">${text}</span>`;
-			}
+			itemRenderer
 		});
 
-		this.palette.on('action', this.onNoteSelect.bind(this));
+		this.palette
+			.on('show', () => this.store.set({ paletteVisible: true }))
+			.on('hide', () => this.store.set({ paletteVisible: false }))
+			.on('action', this.onNoteSelect.bind(this));
+
 		EVENT.on(EVENT.palette.show, () => this.palette.open());
 	},
 

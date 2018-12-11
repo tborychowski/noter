@@ -9,7 +9,7 @@ export default {
 
 	methods: {
 		onkeydown (ev) {
-			if (this.palette.state.open) return;
+			if (this.store.get().paletteVisible) return;
 
 			const {note} = this.store.get();
 			const isEdit = (this.store.get().mode === 'edit');

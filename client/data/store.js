@@ -7,6 +7,7 @@ const store = new Store({
 	folder: '',
 	note: null,
 	mode: 'view',
+	paletteVisible: false,
 });
 
 
