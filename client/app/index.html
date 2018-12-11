@@ -3,9 +3,10 @@
 <Notes ref:notes/>
 <Editor ref:editor/>
 <Palette ref:palette/>
+<Keyboard ref:keyboard/>
 
 <script>
-import {Data, Store, EVENT} from '../data';
+import {Store, EVENT} from '../data';
 import {setUrl, getStateFromUrl} from '../util';
 
 export default {
@@ -15,30 +16,15 @@ export default {
 		Notes: '../notes',
 		Editor: '../editor',
 		Palette: '../palette',
+		Keyboard: '../keyboard',
 	},
 	store: () => Store,
 	oncreate () {
 		this.store.on('state', ({ changed, current }) => setUrl(current));
 		this.store.set(getStateFromUrl());
-		this.load();
+		EVENT.fire(EVENT.notes.load);
 	},
 
-	methods: {
-		load () {
-			Data.Notes.get().then(notes => {
-				this.store.set({ notes });
-
-				const selectedNote = this.store.get().note;
-				if (selectedNote && selectedNote.id && !selectedNote.title) {
-					const note = notes.find(n => n.id === selectedNote.id);
-					this.store.set({ note });
-					EVENT.fire(EVENT.focus.selectedNote);
-				}
-			});
-		},
-
-
-	}
 };
 
 </script>

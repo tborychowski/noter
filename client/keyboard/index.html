@@ -1,0 +1,63 @@
+<script>
+import {Store, EVENT} from '../data';
+
+export default {
+	store: () => Store,
+	oncreate () {
+		document.addEventListener('keydown', this.onkeydown.bind(this));
+	},
+
+	methods: {
+		onkeydown (ev) {
+			if (this.palette.state.open) return;
+
+			const {note} = this.store.get();
+			const isEdit = (this.store.get().mode === 'edit');
+			const newNote = () => EVENT.fire(EVENT.notes.new);
+			const editNote = () => { if (note) EVENT.fire(EVENT.edit.start); };
+			const delNote = () => { if (ev.metaKey || ev.ctrlKey) EVENT.fire(EVENT.notes.del); };
+
+			const keymap = {
+				e: editNote,
+				Enter: editNote,
+				Backspace: delNote,
+				n: newNote,
+				ArrowUp: () => this.goto('up'),
+				ArrowDown: () => this.goto('down'),
+				ArrowRight: () => this.goto('right'),
+				ArrowLeft: () => this.goto('left'),
+			};
+			if (keymap[ev.key] && !isEdit) keymap[ev.key]();
+		},
+
+		goto (where) {
+			if (where === 'folders') return EVENT.fire(EVENT.focus.selectedFolder);
+			if (where === 'notes') return EVENT.fire(EVENT.focus.firstNote);
+
+			const elem = document.activeElement;
+			const isNotes = elem && elem.closest('.notes');
+			const isFolders = elem && elem.closest('.folders');
+			const isEditor = elem && elem.closest('.editor');
+
+			if (!isFolders && !isNotes && !isEditor) return EVENT.fire(EVENT.focus.firstNote);
+
+			if (where === 'left') {
+				if (isNotes) return EVENT.fire(EVENT.focus.selectedFolder);
+				if (isEditor) return EVENT.fire(EVENT.focus.selectedNote);
+			}
+			else if (where === 'right') {
+				if (isFolders) return EVENT.fire(EVENT.focus.firstNote);
+				if (isNotes) return EVENT.fire(EVENT.focus.editorView);
+
+			}
+
+			let newElem;
+			if (where === 'up') newElem = elem.previousElementSibling;
+			else if (where === 'down') newElem = elem.nextElementSibling;
+
+			if (newElem && newElem.matches('.list-item')) newElem.focus();
+		},
+
+	}
+};
+</script>

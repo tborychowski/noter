@@ -5,7 +5,8 @@ export default {
 	off,
 	fire,
 
-	note: {
+	notes: {
+		load: 'notes-load',
 		new: 'note-create',
 		del: 'note-delete',
 	},

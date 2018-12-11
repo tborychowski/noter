@@ -27,10 +27,25 @@ export default {
 		}
 	},
 	oncreate () {
+		EVENT.on(EVENT.notes.load, this.load.bind(this));
 		EVENT.on(EVENT.focus.firstNote, this.focusFirstNote.bind(this));
 		EVENT.on(EVENT.focus.selectedNote, this.focusSelectedNote.bind(this));
 	},
 	methods: {
+		load () {
+			Data.Notes.get().then(notes => {
+				this.store.set({ notes });
+
+				const selectedNote = this.store.get().note;
+				if (selectedNote && selectedNote.id && !selectedNote.title) {
+					const note = notes.find(n => n.id === selectedNote.id);
+					this.store.set({ note });
+					EVENT.fire(EVENT.focus.selectedNote);
+				}
+			});
+
+		},
+
 		ondragstart (ev, item) {
 			ev.dataTransfer.setData('itemId', item.id);
 		},

@@ -57,8 +57,8 @@ export default {
 			}
 		});
 
-		EVENT.on(EVENT.note.new, this.newNote.bind(this));
-		EVENT.on(EVENT.note.del, this.del.bind(this));
+		EVENT.on(EVENT.notes.new, this.newNote.bind(this));
+		EVENT.on(EVENT.notes.del, this.del.bind(this));
 		EVENT.on(EVENT.edit.start, this.edit.bind(this));
 		EVENT.on(EVENT.edit.check, this.checkEditMode.bind(this));
 		EVENT.on(EVENT.focus.editor, this.focusEditor.bind(this));
