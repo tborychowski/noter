@@ -2,11 +2,15 @@
 	<h1>NOTES</h1>
 	<div class="flex-filler"></div>
 
-	<button title="Show palette (cmd+p)" class="btn-icon-big ion-md-search"
-		on:click="showPalette()" on:focus="checkEditMode()"></button>
+	<!-- <button title="New note (n)" class="btn-outline"
+		on:click="newNote()" on:focus="checkEditMode()">New note</button> -->
 
 	<button title="New note (n)" class="btn-icon-big ion-md-add"
 		on:click="newNote()" on:focus="checkEditMode()"></button>
+
+	<button title="Show palette (cmd+p)" class="btn-icon-big ion-md-search"
+		on:click="showPalette()" on:focus="checkEditMode()"></button>
+
 </header>
 
 
@@ -21,11 +25,11 @@ export default {
 		},
 
 		newNote () {
-			EVENT.fire(EVENT.notes.new);
+			if (this.store.get().mode === 'view') EVENT.fire(EVENT.notes.new);
 		},
 
 		showPalette () {
-			EVENT.fire(EVENT.palette.show);
+			if (this.store.get().mode === 'view') EVENT.fire(EVENT.palette.show);
 		},
 	}
 };
