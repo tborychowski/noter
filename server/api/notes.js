@@ -26,7 +26,7 @@ function post (req, res) {
 // update
 function put (req, res) {
 	return DB.put(req.params.id, req.body)
-		.then(result => res.status(200).json({ updated: result[0] }))
+		.then(result => res.status(200).json(result))
 		.catch(e => res.status(500).json(e));
 }
 

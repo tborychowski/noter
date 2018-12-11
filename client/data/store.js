@@ -18,7 +18,7 @@ marked.setOptions({
 });
 
 store.compute('markedNote', ['note'], (note) => {
-	if (note && note.text) note.markedText = marked(note.text);
+	if (note && note.text && !note.markedText) note.markedText = marked(note.text);
 	return note;
 });
 

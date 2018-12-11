@@ -19,7 +19,7 @@ function post (data) {
 
 // update
 function put (id, data) {
-	return Note.update(data, { where: { id } });
+	return Note.update(data, { where: { id } }).then(() => getOne(id));
 }
 
 // delete
