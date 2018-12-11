@@ -24,6 +24,7 @@ export default {
 		selectedNote: 'focus-selected-note',
 		selectedFolder: 'focus-selected-folder',
 		editor: 'focus-editor',
+		editorView: 'focus-editor-view',
 	}
 
 };
