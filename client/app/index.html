@@ -20,17 +20,6 @@ export default {
 	oncreate () {
 		this.store.on('state', ({ changed, current }) => setUrl(current));
 		this.store.set(getStateFromUrl());
-
-		this.refs.palette.on('action', ev => {
-			if (ev.action === 'new-note') this.refs.header.newNote();
-			else if (ev.action === 'start-edit') this.refs.editor.edit();
-			else if (ev.action === 'del-note') this.refs.editor.del();
-		});
-
-		this.refs.header.on('action', ev => {
-			if (ev.action === 'palette-show') this.refs.palette.show();
-		});
-
 		this.load();
 	},
 

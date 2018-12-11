@@ -4,10 +4,11 @@ A [nordically](https://github.com/arcticicestudio/nord) themed note taking app.
 
 
 ### Todo
+- [x] Refactor: better pub-sub: abstract & centralize
 - [ ] Palette: Better item height calc
 - [ ] Notes: note preview (some text + thumb)
-- [ ] Refactor: better pub-sub: abstract & centralize
 - [ ] Refactor: improve focus management (focusing note is in 1000 places!)
+- [ ] NEW: Toaster
 
 - [ ] Editor: file upload - canvas with img to dataURI, save dataURI inline with note text?
 - [ ] Editor: images + thumbs
