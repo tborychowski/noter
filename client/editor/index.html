@@ -26,13 +26,15 @@
 			</div>
 		</div>
 
-		<div class="scroller" tabindex="0">
-			{#if $mode === 'view'}
+		{#if $mode === 'view'}
+			<div class="scroller" tabindex="0">
 				<div class="note-text">{@html $markedNote.markedText || ''}</div>
-			{:else}
+			</div>
+		{:else}
+			<div class="scroller">
 				<textarea bind:value="note.text" on:keydown="onkeydown(event)"></textarea>
-			{/if}
-		</div>
+			</div>
+		{/if}
 	</form>
 	{/if}
 </div>

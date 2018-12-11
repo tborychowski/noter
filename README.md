@@ -10,9 +10,8 @@ A [nordically](https://github.com/arcticicestudio/nord) themed note taking app.
 - [x] Editor: file upload - canvas with img to dataURI, save dataURI inline with note text?
 - [x] Editor: images + thumbs
 
-
-- [ ] Palette: Better item height calc
 - [ ] Notes: note preview in the list (some text + thumb)
 - [ ] NEW: Toaster
+- [ ] Palette: Better item height calc
 
 - [ ] Editor: real code editor?
