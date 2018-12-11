@@ -5,7 +5,7 @@
 <Palette ref:palette/>
 
 <script>
-import {Data, Store} from '../data';
+import {Data, Store, EVENT} from '../data';
 import {setUrl, getStateFromUrl} from '../util';
 
 export default {
@@ -32,6 +32,7 @@ export default {
 				if (selectedNote && selectedNote.id && !selectedNote.title) {
 					const note = notes.find(n => n.id === selectedNote.id);
 					this.store.set({ note });
+					EVENT.fire(EVENT.focus.selectedNote);
 				}
 			});
 		},
