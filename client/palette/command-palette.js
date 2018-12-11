@@ -298,8 +298,9 @@ CommandPalette.prototype.filter = function () {
 	if (!this.data) return this;
 	if (!q) {
 		this.filteredData = Array.from(this.data)
-			.sort((a, b) => b.accessed_at - a.accessed_at)	// recent at top
-			.sort((a, b) => b.visited - a.visited);			// most visited to top
+			.sort((a, b) => b.updated_at - a.updated_at);
+		// .sort((a, b) => b.accessed_at - a.accessed_at)	// recent at top
+		// .sort((a, b) => b.visited - a.visited);			// most visited to top
 	}
 	else {
 		this.filteredData = this.data

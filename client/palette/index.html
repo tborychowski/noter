@@ -1,21 +1,26 @@
 <script>
 import CommandPalette from './command-palette';
 import {Data, Store, EVENT} from '../data';
+import {timeAgo} from '../util';
 
 export default {
 	store: () => Store,
-
 	oncreate () {
 		this.palette = new CommandPalette({
-			searchInFields: ['title', 'text'],
+			searchInFields: ['title', 'folder', 'text'],
 			dataSrc: () => this.store.get().notes,
 			sizeContainer: 'body',
-			itemRenderer: ({title, text, highlighted}) => {
+			itemRenderer: ({title, text, folder, updated_at, highlighted}) => {
 				if (highlighted) {
 					if (highlighted.title) title = highlighted.title;
 					if (highlighted.text) text = highlighted.text;
+					if (highlighted.folder) folder = highlighted.folder;
 				}
-				return `<div class="item-name">${title}</div>
+				return `<div class="item-name">
+						${title}
+						<span class="pill">${folder}</span>
+						<span class="pill">updated: ${timeAgo(updated_at)}</span>
+					</div>
 					<span class="item-sub">${text}</span>`;
 			}
 		});
