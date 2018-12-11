@@ -17,7 +17,7 @@
 </div>
 
 <script>
-import {Data, Store} from '../data';
+import {Data, Store, EVENT} from '../data';
 export default {
 	store: () => Store,
 	computed: {
@@ -35,10 +35,17 @@ export default {
 			return folders;
 		}
 	},
+	oncreate () {
+		EVENT.on(EVENT.focus.selectedFolder, this.focusSelectedFolder.bind(this));
+	},
 	methods: {
+		focusSelectedFolder () {
+			document.querySelector('.folders .folder.selected').focus();
+		},
+
 		open (folder) {
 			if (this.store.get().mode === 'view') this.store.set({ folder, note: null });
-			else document.querySelector('.note-title-input').select();
+			else EVENT.fire(EVENT.focus.editor);
 		},
 		onclick (ev, folder) {
 			ev.preventDefault();

@@ -39,7 +39,7 @@
 
 
 <script>
-import {Data, Store} from '../data';
+import {Data, Store, EVENT} from '../data';
 import {timeAgo} from '../util';
 
 export default {
@@ -56,6 +56,12 @@ export default {
 				if (!current.note.id) this.edit();
 			}
 		});
+
+		EVENT.on(EVENT.note.new, this.newNote.bind(this));
+		EVENT.on(EVENT.note.del, this.del.bind(this));
+		EVENT.on(EVENT.edit.start, this.edit.bind(this));
+		EVENT.on(EVENT.edit.check, this.checkEditMode.bind(this));
+		EVENT.on(EVENT.focus.editor, this.focusEditor.bind(this));
 	},
 	methods: {
 		onkeydown (ev) {
@@ -69,6 +75,21 @@ export default {
 					this.save();
 				}
 			}
+		},
+
+		newNote () {
+			const {mode, folder} = this.store.get();
+			if (mode !== 'view') return this.focusEditor();
+			const note = { title: '', text: '', folder: folder || '' };
+			this.store.set({ note });
+		},
+
+		checkEditMode () {
+			if (this.store.get().mode !== 'view') this.focusEditor();
+		},
+
+		focusEditor () {
+			document.querySelector('.note-folder-input').select();
 		},
 
 		edit () {
@@ -86,7 +107,7 @@ export default {
 			this.store.set({ mode: 'view' });
 
 			if (noNote) this.store.set({ note: null });
-			else document.querySelector('.notes .note.selected').focus();
+			else EVENT.fire(EVENT.focus.selectedNote);
 		},
 
 		save (e) {

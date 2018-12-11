@@ -16,7 +16,7 @@
 
 
 <script>
-import {Data, Store} from '../data';
+import {Data, Store, EVENT} from '../data';
 
 export default {
 	store: () => Store,
@@ -26,15 +26,27 @@ export default {
 			return selected.id === item.id;
 		}
 	},
+	oncreate () {
+		EVENT.on(EVENT.focus.firstNote, this.focusFirstNote.bind(this));
+		EVENT.on(EVENT.focus.selectedNote, this.focusSelectedNote.bind(this));
+	},
 	methods: {
 		ondragstart (ev, item) {
 			ev.dataTransfer.setData('itemId', item.id);
 		},
 
+		focusFirstNote () {
+			document.querySelector('.notes .note').focus();
+		},
+
+		focusSelectedNote () {
+			document.querySelector('.notes .note.selected').focus();
+		},
+
 		open (ev, note) {
 			if (ev) ev.preventDefault();
 			if (this.store.get().mode === 'view') this.store.set({ note });
-			else document.querySelector('.note-title-input').select();
+			else EVENT.fire(EVENT.focus.editor);
 		}
 	}
 };

@@ -1,6 +1,6 @@
 <script>
 import CommandPalette from './command-palette';
-import {Data, Store} from '../data';
+import {Data, Store, EVENT} from '../data';
 
 export default {
 	store: () => Store,
@@ -23,16 +23,13 @@ export default {
 		this.palette.on('action', this.onNoteSelect.bind(this));
 
 		document.addEventListener('keydown', this.onkeydown.bind(this));
+		EVENT.on(EVENT.palette.show, () => this.palette.open());
 	},
 
 	methods: {
-		show ()  {
-			this.palette.open();
-		},
-
 		onNoteSelect (note) {
 			this.store.set({ note, folder: '' });
-			setTimeout(() => document.querySelector('.notes .note.selected').focus(), 10);
+			setTimeout(() => EVENT.fire(EVENT.focus.selectedNote), 10);
 		},
 
 		onkeydown (ev) {
@@ -40,14 +37,14 @@ export default {
 
 			const {note} = this.store.get();
 			const isEdit = (this.store.get().mode === 'edit');
-			const editNote = () => { if (note) this.action('start-edit'); };
-			const delNote = () => { if (ev.metaKey || ev.ctrlKey) this.action('del-note'); };
+			const editNote = () => { if (note) EVENT.fire(EVENT.edit.start); };
+			const delNote = () => { if (ev.metaKey || ev.ctrlKey) EVENT.fire(EVENT.note.del); };
 
 			const keymap = {
 				e: editNote,
 				Enter: editNote,
 				Backspace: delNote,
-				n: () => this.action('new-note'),
+				n: () => EVENT.fire(EVENT.note.new),
 				ArrowUp: () => this.goto('up'),
 				ArrowDown: () => this.goto('down'),
 				ArrowRight: () => this.goto('notes'),
@@ -58,12 +55,12 @@ export default {
 		},
 
 		goto (where) {
-			if (where === 'folders') return document.querySelector('.folders .folder.selected').focus();
-			if (where === 'notes') return document.querySelector('.notes .note').focus();
+			if (where === 'folders') return EVENT.fire(EVENT.focus.selectedFolder);
+			if (where === 'notes') return EVENT.fire(EVENT.focus.firstNote);
 			if (where === 'up' || where === 'down') {
 				const elem = document.activeElement;
 				const isList = elem && elem.closest('.list');
-				if (!isList) return document.querySelector('.notes .note').focus();
+				if (!isList) return EVENT.fire(EVENT.focus.firstNote);
 
 				let newElem;
 				if (where === 'up') newElem = elem.previousElementSibling;
@@ -73,9 +70,6 @@ export default {
 			}
 		},
 
-		action (action) {
-			this.fire('action', { action });
-		}
 	}
 };
 </script>
