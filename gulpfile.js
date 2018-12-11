@@ -47,7 +47,7 @@ gulp.task('assets', () => {
 	gulp.src(['node_modules/ionicons/dist/css/*.css']).pipe(gulp.dest(`${PUBLIC_PATH}css`));
 	gulp.src(['node_modules/ionicons/dist/fonts/*.*']).pipe(gulp.dest(`${PUBLIC_PATH}fonts`));
 	// highlight.js
-	gulp.src(['node_modules/highlight.js/styles/*.css']).pipe(gulp.dest(`${PUBLIC_PATH}themes`));
+	gulp.src(['node_modules/highlight.js/styles/nord.css']).pipe(gulp.dest(`${PUBLIC_PATH}css`));
 });
 
 
