@@ -28,7 +28,13 @@
 
 		{#if $mode === 'view'}
 			<div class="scroller" tabindex="0">
-				<div class="note-text">{@html $markedNote.markedText || ''}</div>
+				<div class="note-text">
+					{#await $markedNote.markedText}
+						Loading...
+					{:then noteText}
+						{@html noteText}
+					{/await}
+				</div>
 			</div>
 		{:else}
 			<div class="scroller">
@@ -114,7 +120,7 @@ export default {
 			this.store.set({ mode: 'view' });
 
 			if (noNote) this.store.set({ note: null });
-			else EVENT.fire(EVENT.focus.selectedNote);
+			else this.focusEditorView();
 		},
 
 		save (e) {

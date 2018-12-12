@@ -7,10 +7,10 @@
 	display flex
 	flex-flow column
 	line-height 1.4
+	margin 0 1px 1px 0
 
 	&:not(.edit):focus-within
-		box-shadow 0 0 0 1px color-accent inset
-		outline none
+		outline 1px solid color-accent
 
 	.scroller:focus
 		outline none
@@ -93,6 +93,7 @@
 .editor.view .editor-header-row.edit
 .editor.edit .editor-header-row.view
 	display none
+
 
 
 // NOTE STYLES
