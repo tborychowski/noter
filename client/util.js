@@ -24,6 +24,15 @@ function timeAgo (date) {
 }
 
 
+
+function getImageFromMarkdown (text) {
+	const reg = /!\[(.*?)\]\((.*?)\)/g;
+	const res = reg.exec(text);
+	if (!res || !res.length) return '';
+	return res.pop();
+}
+
+
 function slugify (text) {
 	return text.toString().toLowerCase().trim()
 		.replace(/&/g, '-and-')         // Replace & with 'and'
@@ -56,4 +65,5 @@ export {
 	slugify,
 	setUrl,
 	getStateFromUrl,
+	getImageFromMarkdown,
 };

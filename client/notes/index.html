@@ -7,8 +7,14 @@
 			tabindex="0"
 			on:focus="open(null, item)"
 			on:dragstart="ondragstart(event, item)">
-				{item.title}
-				<span class="list-item-badge pill">{item.folder}</span>
+				<div class="note-details">
+					<div class="note-title">{item.title}</div>
+					<div class="list-item-badge">{item.folder}</div>
+					<div class="list-item-badge">{timeAgo(item.updated_at)}</div>
+				</div>
+				{#if item.thumb}
+					<div class="note-thumb" style="background-image: url('{item.thumb}')"></div>
+				{/if}
 		</div>
 		{/each}
 	</div>
@@ -17,6 +23,7 @@
 
 <script>
 import {Data, Store, EVENT} from '../data';
+import {timeAgo, getImageFromMarkdown} from '../util';
 
 export default {
 	store: () => Store,
@@ -24,7 +31,8 @@ export default {
 		isSelected (item, selected) {
 			if (!selected || !item) return false;
 			return selected.id === item.id;
-		}
+		},
+		timeAgo
 	},
 	oncreate () {
 		EVENT.on(EVENT.notes.load, this.load.bind(this));
@@ -34,6 +42,8 @@ export default {
 	methods: {
 		load () {
 			Data.Notes.get().then(notes => {
+				notes.forEach(n => { n.thumb = getImageFromMarkdown(n.text); });
+
 				this.store.set({ notes });
 
 				const selectedNote = this.store.get().note;
