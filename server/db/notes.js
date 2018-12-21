@@ -24,7 +24,6 @@ function put (id, data) {
 
 // delete
 function del (id, data = { force: false }) {
-	console.log(data);
 	return Note.destroy({ where: { id }, force: data.force });
 }
 
