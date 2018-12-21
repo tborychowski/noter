@@ -13,7 +13,11 @@
 			</div>
 			<div class="editor-header-row edit">
 				<label>Folder:</label>
-				<input class="note-folder-input" bind:value="note.folder" placeholder="folder" on:keydown="onkeydown(event)">
+				<input class="note-folder-input"
+					placeholder="folder"
+					ref:folder
+					bind:value="note.folder"
+					on:keydown="onkeydown(event)">
 				<div class="flex-filler"></div>
 				<button type="submit" class="btn-icon ion-md-checkmark btn-save success" title="Save (Enter)"></button>
 				{#if note.id}
@@ -22,7 +26,11 @@
 				<button type="button" class="btn-icon ion-md-close btn-cancel" on:click="cancel()" title="Cancel (Esc)"></button>
 			</div>
 			<div class="editor-header-row edit">
-				<input class="note-title-input" bind:value="note.title" ref:title on:keydown="onkeydown(event)" placeholder="New note">
+				<input class="note-title-input"
+					placeholder="New note"
+					ref:title
+					bind:value="note.title"
+					on:keydown="onkeydown(event)">
 			</div>
 		</div>
 
@@ -38,7 +46,7 @@
 			</div>
 		{:else}
 			<div class="scroller">
-				<textarea bind:value="note.text" on:keydown="onkeydown(event)"></textarea>
+				<textarea ref:text bind:value="note.text" on:keydown="onkeydown(event)"></textarea>
 			</div>
 		{/if}
 	</form>
@@ -80,9 +88,15 @@ export default {
 					ev.stopPropagation();
 					this.cancel();
 				}
-				else if (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey)) {
-					this.save();
+				else if (ev.key === 'ArrowDown') {
+					if (ev.target.matches('.note-folder-input')) this.refs.title.focus();
+					else if (ev.target.matches('.note-title-input')) this.refs.text.focus();
 				}
+				else if (ev.key === 'ArrowUp') {
+					if (ev.target.matches('.note-title-input')) this.refs.folder.focus();
+					// else if (ev.target.matches('.note-title-input')) this.refs.text.focus();
+				}
+				else if (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey)) this.save();
 			}
 		},
 

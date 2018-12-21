@@ -33,7 +33,8 @@ store.compute('notesInFolder', ['folder', 'notes'], (folder, notes) => {
 		else notes = notes.filter(n => n.folder === folder && !n.deleted_at);
 	}
 	else notes = notes.filter(n => !n.deleted_at);
-	return notes.sort((a, b) => a.title.localeCompare(b.title));
+	// return notes.sort((a, b) => a.title.localeCompare(b.title));
+	return notes.sort((a, b) => b.updated_at.localeCompare(a.updated_at));
 });
 
 
