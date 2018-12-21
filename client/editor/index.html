@@ -17,7 +17,7 @@
 				<div class="flex-filler"></div>
 				<button type="submit" class="btn-icon ion-md-checkmark btn-save success" title="Save (Enter)"></button>
 				{#if note.id}
-					<button type="button" class="btn-icon ion-md-trash btn-remove danger" on:click="del(note.id)" title="Delete"></button>
+					<button type="button" class="btn-icon ion-md-trash btn-remove danger" on:click="del(note.id)" title="Move to bin"></button>
 				{/if}
 				<button type="button" class="btn-icon ion-md-close btn-cancel" on:click="cancel()" title="Cancel (Esc)"></button>
 			</div>
@@ -147,8 +147,10 @@ export default {
 			if (!id) return;
 			const notes = this.store.get().notes;
 			const idx = notes.findIndex(n => n.id === id);
-			if (window.confirm(`Are you sure you wish to delete "${notes[idx].title}"`)) {
-				Data.Notes.del(id).then(res => {
+			const note = notes[idx];
+			if (window.confirm(`Are you sure you wish to delete "${note.title}"`)) {
+				const delfn = (note.deleted_at ? 'del' : 'bin');
+				Data.Notes[delfn](id).then(res => {
 					this.close();
 					if (idx > -1) notes.splice(idx, 1);
 					this.store.set({ notes });

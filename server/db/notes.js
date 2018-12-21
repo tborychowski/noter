@@ -8,7 +8,7 @@ function getOne (id) {
 function get (query) {
 	const where = {};
 	if (query.folder) where.folder = query.folder;
-	return Note.findAll({ where, order: [['title', 'ASC'], ['id', 'DESC']] });
+	return Note.findAll({ where, order: [['title', 'ASC'], ['id', 'DESC']], paranoid: false });
 }
 
 // add new
@@ -23,8 +23,9 @@ function put (id, data) {
 }
 
 // delete
-function del (id) {
-	return Note.destroy({ where: { id } });
+function del (id, data = { force: false }) {
+	console.log(data);
+	return Note.destroy({ where: { id }, force: data.force });
 }
 
 

@@ -28,7 +28,11 @@ store.compute('markedNote', ['note'], (note) => {
 });
 
 store.compute('notesInFolder', ['folder', 'notes'], (folder, notes) => {
-	if (folder) notes = notes.filter(n => n.folder === folder);
+	if (folder) {
+		if (folder === 'Bin') notes = notes.filter(n => n.deleted_at);
+		else notes = notes.filter(n => n.folder === folder && !n.deleted_at);
+	}
+	else notes = notes.filter(n => !n.deleted_at);
 	return notes.sort((a, b) => a.title.localeCompare(b.title));
 });
 
