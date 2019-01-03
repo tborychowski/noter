@@ -38,7 +38,10 @@ const Notes = {
 	},
 	del (id) {
 		return del(`${this.base}/${id}`, { force: true });
-	}
+	},
+	undelete (id) {
+		return del(`${this.base}/${id}`, { restore: true });
+	},
 };
 
 

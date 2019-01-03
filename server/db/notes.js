@@ -24,6 +24,7 @@ function put (id, data) {
 
 // delete
 function del (id, data = { force: false }) {
+	if (data.restore) return Note.restore({ where: { id } });
 	return Note.destroy({ where: { id }, force: data.force });
 }
 

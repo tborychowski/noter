@@ -9,6 +9,9 @@
 					created {timeAgo($markedNote.created_at)}<br>
 					updated {timeAgo($markedNote.updated_at)}
 				</div>
+				{#if $markedNote.deleted_at}
+				<button type="button" class="btn-icon ion-md-undo btn-edit" on:click="undelete($markedNote.id)" title="Undelete"></button>
+				{/if}
 				<button type="button" class="btn-icon ion-md-create btn-edit" on:click="edit($markedNote)" title="Edit (e)"></button>
 			</div>
 			<div class="editor-header-row edit">
@@ -156,6 +159,18 @@ export default {
 			this.store.set({ notes, note });
 		},
 
+		undelete (id) {
+			if (!id) return;
+			console.log(id);
+			const notes = this.store.get().notes;
+			const idx = notes.findIndex(n => n.id === id);
+			const note = notes[idx];
+			Data.Notes.undelete(id).then(res => {
+				delete note.deleted_at;
+				this.store.set({ notes, folder: '', note });
+			});
+		},
+
 		del (id) {
 			if (!id) id = this.store.get().note.id;
 			if (!id) return;
@@ -166,7 +181,7 @@ export default {
 				const delfn = (note.deleted_at ? 'del' : 'bin');
 				Data.Notes[delfn](id).then(res => {
 					this.close();
-					if (idx > -1) notes.splice(idx, 1);
+					note.deleted_at = +new Date();
 					this.store.set({ notes });
 				});
 			}
