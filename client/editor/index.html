@@ -10,7 +10,7 @@
 					updated {timeAgo($markedNote.updated_at)}
 				</div>
 				{#if $markedNote.deleted_at}
-				<button type="button" class="btn-icon ion-md-undo btn-edit" on:click="undelete($markedNote.id)" title="Undelete"></button>
+				<button type="button" class="btn-icon ion-md-undo btn-edit" on:click="undelete($markedNote.id)" title="Restore (r)"></button>
 				{/if}
 				<button type="button" class="btn-icon ion-md-create btn-edit" on:click="edit($markedNote)" title="Edit (e)"></button>
 			</div>
@@ -78,6 +78,7 @@ export default {
 
 		EVENT.on(EVENT.notes.new, this.newNote.bind(this));
 		EVENT.on(EVENT.notes.del, this.del.bind(this));
+		EVENT.on(EVENT.notes.undelete, this.undelete.bind(this));
 		EVENT.on(EVENT.edit.start, this.edit.bind(this));
 		EVENT.on(EVENT.edit.check, this.checkEditMode.bind(this));
 		EVENT.on(EVENT.focus.editor, this.focusEditor.bind(this));
@@ -160,14 +161,15 @@ export default {
 		},
 
 		undelete (id) {
+			if (!id) id = this.store.get().note.id;
 			if (!id) return;
-			console.log(id);
 			const notes = this.store.get().notes;
 			const idx = notes.findIndex(n => n.id === id);
 			const note = notes[idx];
 			Data.Notes.undelete(id).then(res => {
 				delete note.deleted_at;
 				this.store.set({ notes, folder: '', note });
+				EVENT.fire(EVENT.toast.show, 'Note restored');
 			});
 		},
 
@@ -183,6 +185,7 @@ export default {
 					this.close();
 					note.deleted_at = +new Date();
 					this.store.set({ notes });
+					EVENT.fire(EVENT.toast.show, delfn === 'bin' ? 'Note moved to bin' : 'Note deleted');
 				});
 			}
 		},

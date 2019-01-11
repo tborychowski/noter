@@ -1,9 +1,10 @@
-<Header ref:header/>
-<Folders ref:folders/>
-<Notes ref:notes/>
-<Editor ref:editor/>
-<Palette ref:palette/>
-<Keyboard ref:keyboard/>
+<Header/>
+<Folders/>
+<Notes/>
+<Editor/>
+<Palette/>
+<Keyboard/>
+<Toaster/>
 
 <script>
 import {Store, EVENT} from '../data';
@@ -17,6 +18,7 @@ export default {
 		Editor: '../editor',
 		Palette: '../palette',
 		Keyboard: '../keyboard',
+		Toaster: '../toaster',
 	},
 	store: () => Store,
 	oncreate () {

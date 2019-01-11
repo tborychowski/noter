@@ -4,6 +4,20 @@ function formatNumber (num) {
 }
 
 
+// function guid () {
+// 	const s4 = () => Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+// 	return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+// }
+
+
+function guid () {
+	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+		const r = Math.random() * 16 | 0;
+		const v = c == 'x' ? r : (r & 0x3 | 0x8);
+		return v.toString(16);
+	});
+}
+
 
 function timeAgo (date) {
 	if (typeof date === 'string') date = new Date(date);
@@ -61,6 +75,7 @@ function getStateFromUrl () {
 
 export {
 	formatNumber,
+	guid,
 	timeAgo,
 	slugify,
 	setUrl,

@@ -21,7 +21,7 @@
 		"winston": "^3.0.0"
 	},
 	"devDependencies": {
-    "babel-core": "^6.26.3",
+		"babel-core": "^6.26.3",
 		"babel-loader": "^7.1.2",
 		"babel-minify-webpack-plugin": "^0.3.1",
 		"babel-preset-env": "^1.7.0",
@@ -38,7 +38,7 @@
 		"gulp-sourcemaps": "^2.6.4",
 		"gulp-stylus": "^2.7.0",
 		"highlight.js": "^9.13.1",
-    "ionicons": "^4.4.8",
+		"ionicons": "^4.4.8",
 		"marked": "^0.5.2",
 		"minimist": "^1.2.0",
 		"npm-run-all": "^4.1.3",

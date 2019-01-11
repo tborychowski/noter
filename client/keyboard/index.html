@@ -15,10 +15,12 @@ export default {
 			const isEdit = (this.store.get().mode === 'edit');
 			const newNote = () => EVENT.fire(EVENT.notes.new);
 			const editNote = () => { if (note) EVENT.fire(EVENT.edit.start); };
+			const undeleteNote = () => { EVENT.fire(EVENT.notes.undelete); };
 			const delNote = () => { if (ev.metaKey || ev.ctrlKey) EVENT.fire(EVENT.notes.del); };
 
 			const keymap = {
 				e: editNote,
+				u: undeleteNote,
 				Enter: editNote,
 				Backspace: delNote,
 				n: newNote,

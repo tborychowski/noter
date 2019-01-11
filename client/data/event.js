@@ -9,6 +9,7 @@ export default {
 		load: 'notes-load',
 		new: 'note-create',
 		del: 'note-delete',
+		undelete: 'note-undelete',
 	},
 
 	edit: {
@@ -26,6 +27,12 @@ export default {
 		selectedFolder: 'focus-selected-folder',
 		editor: 'focus-editor',
 		editorView: 'focus-editor-view',
+	},
+
+	toast: {
+		show: 'info-toast',
+		error: 'error-toast',
+		warning: 'warning-toast',
 	}
 
 };
