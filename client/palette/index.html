@@ -10,7 +10,8 @@ function itemRenderer ({title, text, folder, updated_at, highlighted}) {
 		if (highlighted.folder) folder = highlighted.folder;
 	}
 	return `<div class="item-name">
-			${title}
+			<span class="title">${title}</span>
+			<span class="flex-filler"></span>
 			<span class="pill">${folder}</span>
 			<span class="pill">updated: ${timeAgo(updated_at)}</span>
 		</div>

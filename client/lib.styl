@@ -73,6 +73,16 @@ bottom(n = 0) { bottom: px(n) }
 z(n = 0) { z-index: n }
 //*** SHORTCUTS ************************************************************************************
 
+multiline-ellipsis(lines)
+	display block
+	display -webkit-box
+	-webkit-line-clamp lines
+	-webkit-box-orient vertical
+	overflow hidden
+	text-overflow ellipsis
+	word-wrap break-word
+
+
 
 // top, right, bottom, left
 pos()

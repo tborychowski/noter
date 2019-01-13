@@ -13,7 +13,7 @@ function animateElement (el, from, to, opts) {
 
 function CommandPalette (config) {
 	if (!(this instanceof CommandPalette)) return new CommandPalette(config);
-	const defaults = { valueField: 'name', maxItems: 7 };
+	const defaults = { valueField: 'name', maxItems: 50 };
 
 	this.input = null;
 	this.list = null;

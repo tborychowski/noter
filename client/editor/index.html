@@ -7,7 +7,10 @@
 				<div class="flex-filler"></div>
 				<div class="dates">
 					created {timeAgo($markedNote.created_at)}<br>
-					updated {timeAgo($markedNote.updated_at)}
+					updated {timeAgo($markedNote.updated_at)}<br>
+					{#if $markedNote.deleted_at}
+						deleted {timeAgo($markedNote.deleted_at)}<br>
+					{/if}
 				</div>
 				{#if $markedNote.deleted_at}
 				<button type="button" class="btn-icon ion-md-undo btn-edit" on:click="undelete($markedNote.id)" title="Restore (r)"></button>
