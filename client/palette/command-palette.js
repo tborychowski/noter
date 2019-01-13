@@ -388,7 +388,7 @@ CommandPalette.prototype.close = function () {
 	this.state.selectedIndex = -1;
 	document.body.classList.remove(`${className}-visible`);
 
-	animateElement(this.el, {opacity: 1}, {opacity: 0}, {duration: 100 })
+	animateElement(this.el, {opacity: 1}, {opacity: 0}, {duration: 200 })
 		.then(() => this.el.classList.add('hidden'));
 
 
