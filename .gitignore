@@ -8,5 +8,5 @@ tmp/
 *.log
 *.db
 
-.config-prod.js
 config/production.json
+package-lock.json

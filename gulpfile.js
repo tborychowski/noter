@@ -1,104 +1,131 @@
-const gulp = require('gulp');
-const cssmin = require('gulp-clean-css');
-const webpack = require('webpack-stream');
-const concat = require('gulp-concat');
-const stylus = require('gulp-stylus');
-const notify = require('gulp-notify');
-const plumber = require('gulp-plumber');
-const eslint = require('gulp-eslint');
-const nodemon = require('gulp-nodemon');
-const noop = require('through2').obj;
-const sourcemaps = require('gulp-sourcemaps');
+const { series, parallel, src, dest, watch } = require('gulp');
 const livereload = require('gulp-livereload');
 const env = require('gulp-env');
 const isProd = require('minimist')(process.argv.slice(2)).prod;
-const webpackConfig = require('./webpack.config.js');
 const PUBLIC_PATH = 'public/';
-
-const wpErr = (err, stats) => {
-	if (err) notify.onError('Error: ' + err);
-	err = stats.compilation.errors;
-	if (err.length) notify.onError('Error: ' + err[0].message);
-};
-
-let serverStarted = false;
-
 
 env.set({ NODE_ENV: isProd ? 'production' : 'development' });
 
 
-gulp.task('help', () => {
-	const tasks = '  ' + Object.keys(gulp.tasks).sort().join('\n  ');
-	console.log(`\nAvailable tasks:\n${tasks}\n`);/* eslint no-console: 0 */
-});
+function webpackLogger (err) {
+	const chalk = require('chalk');
+	let time = new Date().toTimeString().substr(0,8);
+	let message = 'Finished ' + chalk.green('webpack') + ' build';
+	if (err) { message = chalk.red(err); time = chalk.red(time); }
+	else time = chalk.grey(time);
+	console.log(`[${time}] ${message}`); /* eslint no-console: 0 */
+}
 
 
-gulp.task('eslint', () => {
-	return gulp.src(['client/**/*.js', 'server/**/*.js'])
-		.pipe(eslint())
-		.pipe(eslint.format())
-		.pipe(eslint.failAfterError());
-});
-
-
-gulp.task('assets', () => {
-	gulp.src(['assets/*.*']).pipe(gulp.dest(PUBLIC_PATH));
-
-	gulp.src(['node_modules/ionicons/dist/css/*.css']).pipe(gulp.dest(`${PUBLIC_PATH}css`));
-	gulp.src(['node_modules/ionicons/dist/fonts/*.*']).pipe(gulp.dest(`${PUBLIC_PATH}fonts`));
-	// highlight.js
-	gulp.src(['node_modules/highlight.js/styles/nord.css']).pipe(gulp.dest(`${PUBLIC_PATH}css`));
-});
-
-
-gulp.task('js', ['eslint'], () => {
-	if (!isProd) webpackConfig.devtool = 'inline-source-map';
-	else {
-		const MinifyPlugin = require('babel-minify-webpack-plugin');
-		webpackConfig.plugins = [ new MinifyPlugin() ];
-	}
-
-	return gulp.src(['client/index.js'])
-		.pipe(plumber({ errorHandler: notify.onError('Error: <%= error.message %>') }))
-		.pipe(webpack(webpackConfig, null, wpErr))
-		.pipe(gulp.dest(PUBLIC_PATH))
-		.pipe(livereload());
-
-});
-
-
-gulp.task('styl', () => {
-	return gulp.src(['client/index.styl', 'client/**/*.styl'])
-		.pipe(isProd ? noop() : sourcemaps.init())
-		.pipe(plumber({ errorHandler: notify.onError('Error: <%= error.message %>') }))
-		.pipe(stylus({ paths: ['client'], 'include css': true }))
-		.pipe(isProd ? cssmin({ keepSpecialComments: 0 }) : noop())
-		.pipe(concat('app.css'))
-		.pipe(isProd ? noop() : sourcemaps.write())
-		.pipe(gulp.dest(`${PUBLIC_PATH}css`))
-		.pipe(livereload());
-});
-
-
-gulp.task('server', done => {
-	nodemon({ script: './server/index.js', watch: ['./server'], ext: 'js html' })
+let serverStarted = false;
+function server (done) {
+	const nodemon = require('gulp-nodemon');
+	return nodemon({ script: './server/index.js', watch: ['./server'], ext: 'js html' })
 		.on('start', () => {
 			if (serverStarted) return;
 			serverStarted = true;
 			setTimeout(done, 500);
 		});
-});
+}
 
 
-gulp.task('watch', () => {
+function eslint () {
+	const gulpEslint = require('gulp-eslint');
+	return src(['client/**/*.js', 'server/**/*.js'])
+		.pipe(gulpEslint())
+		.pipe(gulpEslint.format())
+		.pipe(gulpEslint.failAfterError());
+}
+
+
+function assets () {
+	src(['node_modules/ionicons/dist/css/*.css']).pipe(dest(`${PUBLIC_PATH}css`));
+	src(['node_modules/ionicons/dist/fonts/*.*']).pipe(dest(`${PUBLIC_PATH}fonts`));
+	// highlight.js
+	src(['node_modules/highlight.js/styles/nord.css']).pipe(dest(`${PUBLIC_PATH}css`));
+
+	return src(['assets/*.*']).pipe(dest(PUBLIC_PATH));
+}
+
+
+function styl () {
+	const cssmin = require('gulp-clean-css');
+	const sourcemaps = require('gulp-sourcemaps');
+	const concat = require('gulp-concat');
+	const stylus = require('gulp-stylus');
+	const noop = require('through2').obj;
+
+	return src(['client/index.styl', 'client/**/*.styl'])
+		.pipe(isProd ? noop() : sourcemaps.init())
+		.pipe(stylus({ paths: ['client'], 'include css': true }))
+		.pipe(isProd ? cssmin({ keepSpecialComments: 0 }) : noop())
+		.pipe(concat('app.css'))
+		.pipe(isProd ? noop() : sourcemaps.write())
+		.pipe(dest(`${PUBLIC_PATH}css`))
+		.pipe(livereload());
+}
+
+
+function js () {
+	const path = require('path');
+	const webpack = require('webpack');
+	const webpackStream = require('webpack-stream');
+	const webpackConfig = {
+		entry: { index: './client/index.js' },
+		output: {
+			filename: 'app.js',
+			path: path.join(__dirname, 'public'),
+			publicPath: './public/',
+		},
+		resolve: { extensions: ['.js', '.json', '.html'] },
+		stats: 'normal',	// minimal
+		module: {
+			rules: [
+				{ test: /\.js$/, use: 'babel-loader', exclude: /node_modules/ },
+				{
+					test: /\.html$/,
+					exclude: /node_modules/,
+					use: { loader: 'svelte-loader', options: { css: false } },
+				},
+			]
+		}
+	};
+
+	if (!isProd) {
+		webpackConfig.devtool = 'inline-source-map';
+		webpackConfig.mode = 'development';
+	}
+	else {
+		const MinifyPlugin = require('babel-minify-webpack-plugin');
+		webpackConfig.plugins = [ new MinifyPlugin() ];
+	}
+
+	return src(['client/index.js'])
+		.pipe(webpackStream(webpackConfig, webpack, webpackLogger))
+		.on('error', function () { this.emit('end'); })
+		.pipe(dest(PUBLIC_PATH))
+		.pipe(livereload());
+
+}
+
+
+function watchTask () {
 	if (isProd) return;
 	livereload.listen();
-	gulp.watch('client/**/*.styl', ['styl']);
-	gulp.watch('client/**/*.js', ['js']);
-	gulp.watch('client/**/*.html', ['js']);
-	gulp.watch('assets/**/*.*', ['assets']);
-});
+	watch('client/**/*.styl', styl);
+	watch('client/**/*.js', js);
+	watch('client/**/*.html', js);
+	watch('assets/**/*.*', assets);
+}
+
+const defaultTask = parallel(assets, styl, eslint, js);
 
 
-gulp.task('client', [ 'js', 'styl', 'assets', 'eslint', 'watch' ]);
-gulp.task('default', [ 'client' ]);
+exports.styl = styl;
+exports.eslint = eslint;
+exports.assets = assets;
+exports.js = js;
+exports.server = server;
+
+exports.default = defaultTask;
+exports.watch = series(defaultTask, watchTask);
