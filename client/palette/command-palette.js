@@ -192,7 +192,8 @@ CommandPalette.prototype.onFocus = function () {
 
 
 CommandPalette.prototype.onInput = function () {
-	this.load().then(() => this.filter().updateList());
+	if (this.inputTimer) clearTimeout(this.inputTimer);
+	this.inputTimer = setTimeout(() => this.filter().updateList(), 100);
 };
 
 
@@ -459,4 +460,3 @@ Object.defineProperties(CommandPalette.prototype, {
 
 
 export default CommandPalette;
-
