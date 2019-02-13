@@ -21,7 +21,7 @@
 					{/if}
 				</div>
 				{#if $markedNote.deleted_at}
-				<button type="button" class="btn-icon ion-md-undo btn-edit" on:click="undelete($markedNote.id)" title="Restore (r)"></button>
+				<button type="button" class="btn-icon ion-md-undo btn-edit" on:click="undelete($markedNote.id)" title="Undelete (u)"></button>
 				{/if}
 				<button type="button" class="btn-icon ion-md-create btn-edit" on:click="edit($markedNote)" title="Edit (e)"></button>
 			</div>
@@ -188,6 +188,7 @@ export default {
 				delete note.deleted_at;
 				this.store.set({ notes, folder: '', note });
 				EVENT.fire(EVENT.toast.show, 'Note restored');
+				EVENT.fire(EVENT.focus.selectedNote);
 			});
 		},
 

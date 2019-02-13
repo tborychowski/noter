@@ -24,7 +24,6 @@ export default {
 		folders ({$notes}) {
 			const map = {};
 			const folders = [];
-
 			const binned = $notes.filter(n => n.deleted_at);
 			const all = $notes.filter(n => !n.deleted_at);
 
@@ -33,11 +32,8 @@ export default {
 			}
 			for (let name in map) folders.push({ name, count: map[name] });
 			folders.sort((a, b) => a.name.localeCompare(b.name));
-
 			folders.unshift({ name: '', count: $notes.length - binned.length });
-
-			folders.push({ name: 'Bin', count: binned.length });
-
+			if (binned.length) folders.push({ name: 'Bin', count: binned.length });
 			return folders;
 		}
 	},
