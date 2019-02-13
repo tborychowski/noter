@@ -1,3 +1,11 @@
+{#if $selectedNotes.length > 1}
+	{#each clones as i }
+		<div class="editor editor-clone editor-clone-{i}"></div>
+	{/each}
+	<div class="editor editor-clone">
+		{$selectedNotes.length} notes selected
+	</div>
+{:else}
 <div class="editor {$mode}">
 	{#if $markedNote}
 	<form on:submit="save(event)">
@@ -46,7 +54,7 @@
 					{#await $markedNote.markedText}
 						Loading...
 					{:then noteText}
-						{@html noteText}
+						{@html noteText || ''}
 					{/await}
 				</div>
 			</div>
@@ -58,7 +66,7 @@
 	</form>
 	{/if}
 </div>
-
+{/if}
 
 <script>
 import {Data, Store, EVENT} from '../data';
@@ -68,6 +76,13 @@ export default {
 	store: () => Store,
 	data () {
 		return { note: {} }
+	},
+	computed: {
+		clones ({$selectedNotes}) {
+			if (!$selectedNotes || $selectedNotes.length < 2) return;
+			const len = Math.min($selectedNotes.length - 1, 3);
+			return new Array(len).fill(0).map((a, i) => len - i)
+		}
 	},
 	helpers: {
 		timeAgo
@@ -186,7 +201,7 @@ export default {
 				const delfn = (note.deleted_at ? 'del' : 'bin');
 				Data.Notes[delfn](id).then(res => {
 					this.close();
-					note.deleted_at = +new Date();
+					note.deleted_at = new Date();
 					this.store.set({ notes });
 					EVENT.fire(EVENT.toast.show, delfn === 'bin' ? 'Note moved to bin' : 'Note deleted');
 				});

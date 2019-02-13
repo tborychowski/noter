@@ -1,11 +1,13 @@
 <div class="list notes">
-	<div class="scroller">
+	<div class="scroller" ref:notelistel>
 		{#each $notesInFolder as item}
 		<div
-			class="list-item note {isSelected(item, $note) ? 'selected' : ''}"
+			class="list-item note {isSelected(item, $selectedNotes) ? 'selected' : ''} note-{item.id}"
+			data-id="{item.id}"
 			draggable="true"
 			tabindex="0"
-			on:focus="open(null, item)"
+			on:focus="open(event, item)"
+			on:mousedown="select(event, item, this)"
 			on:dragstart="ondragstart(event, item)">
 				<div class="note-details">
 					<div class="note-title">{item.title}</div>
@@ -23,14 +25,14 @@
 
 <script>
 import {Data, Store, EVENT} from '../data';
-import {timeAgo, getImageFromMarkdown} from '../util';
+import {timeAgo, getImageFromMarkdown, unique} from '../util';
 
 export default {
 	store: () => Store,
 	helpers: {
-		isSelected (item, selected) {
-			if (!selected || !item) return false;
-			return selected.id === item.id;
+		isSelected (item, selectedNotes) {
+			if (!selectedNotes.length || !item) return false;
+			return !!selectedNotes.find(n => n.id === item.id);
 		},
 		timeAgo
 	},
@@ -38,6 +40,8 @@ export default {
 		EVENT.on(EVENT.notes.load, this.load.bind(this));
 		EVENT.on(EVENT.focus.firstNote, this.focusFirstNote.bind(this));
 		EVENT.on(EVENT.focus.selectedNote, this.focusSelectedNote.bind(this));
+		EVENT.on(EVENT.focus.updown, this.focusNoteUpDown.bind(this));
+		EVENT.on(EVENT.focus.selectedFolder, this.unselectNotes.bind(this));
 	},
 	methods: {
 		load () {
@@ -61,15 +65,86 @@ export default {
 		},
 
 		focusFirstNote () {
-			document.querySelector('.notes .note').focus();
+			const noteEl = document.querySelector('.notes .note');
+			if (!noteEl) return;
+			const note = this.getNoteFromEl(noteEl);
+			this.setSelectedNotes([note], true);
+			noteEl.focus();
 		},
 
 		focusSelectedNote () {
-			document.querySelector('.notes .note.selected').focus();
+			const note = document.querySelector('.notes .note.selected');
+			if (note) note.focus();
+		},
+
+		select (ev, item, noteEl) {
+			if (ev.shiftKey) {
+				let {note, notesInFolder} = this.store.get()
+				const selectedNotes = [];
+				const noteArray = Array.from(noteEl.parentNode.children);
+				const noteIdx = noteArray.indexOf(noteEl);
+				const focusedEl = this.getElFromNote(note);
+				const focusedIdx = noteArray.indexOf(focusedEl);
+				const from = Math.min(focusedIdx, noteIdx);
+				const to = Math.max(focusedIdx, noteIdx);
+				for (let i = from; i <= to; i += 1) {
+					selectedNotes.push(notesInFolder[i]);
+				}
+				this.setSelectedNotes(selectedNotes);
+			}
+			else if (ev.metaKey) this.toggleSelectedNotes([item]);
+			else this.setSelectedNotes([item], true);
+		},
+
+		getElFromNote (note) {
+			return this.refs.notelistel.querySelector('.note-' + note.id);
+		},
+
+		getNoteFromEl (el) {
+			const {notesInFolder} = this.store.get();
+			const id = parseInt(el.dataset.id, 10) || null;
+			return notesInFolder.find(n => n.id === id);
+		},
+
+		toggleSelectedNotes (items) {
+			let {selectedNotes} = this.store.get()
+			items.forEach(item => {
+				const idx = selectedNotes.indexOf(item);
+				if (idx > -1) selectedNotes.splice(idx, 1);
+				else selectedNotes.push(item);
+			});
+			this.setSelectedNotes(selectedNotes, true);
+		},
+
+		setSelectedNotes (notes, replace) {
+			let {selectedNotes} = this.store.get()
+			if (replace) selectedNotes = [];
+			selectedNotes.push(...new Set(notes));
+			this.store.set({ selectedNotes: unique(selectedNotes) })
+		},
+
+		focusNoteUpDown (ev, where, elem) {
+			if (!elem) return;
+			ev.preventDefault();
+
+			let newElem;
+			if (where === 'up') newElem = elem.previousElementSibling;
+			else if (where === 'down') newElem = elem.nextElementSibling;
+			if (!newElem) return;
+
+			const notes = [];
+			if (ev.shiftKey) notes.push(this.getNoteFromEl(elem));
+			notes.push(this.getNoteFromEl(newElem));
+			this.setSelectedNotes(notes, !ev.shiftKey);
+
+			if (newElem && newElem.matches('.list-item')) newElem.focus();
+		},
+
+		unselectNotes () {
+			this.store.set({ selectedNotes: [] });
 		},
 
 		open (ev, note) {
-			if (ev) ev.preventDefault();
 			if (this.store.get().mode === 'view') this.store.set({ note });
 			else EVENT.fire(EVENT.focus.editor);
 		}

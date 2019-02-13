@@ -73,6 +73,25 @@ function getStateFromUrl () {
 }
 
 
+/**
+ * Make array unique
+ * Changes the array in place
+ * @param {Array} a - array to make unique
+ * @param {*} b     - placeholder
+ * @param {*} c     - placeholder
+ * @returns {Array} returns the unique array
+ */
+function unique (a, b, c) {
+	b = a.length;
+	while (c = --b, c > 0) {
+		while (c-- > 0) {
+			(a[b] && a[b].id) !== (a[c] && a[c].id) || a.splice(c, 1);
+		}
+	}
+	return a;
+}
+
+
 export {
 	formatNumber,
 	guid,
@@ -81,4 +100,5 @@ export {
 	setUrl,
 	getStateFromUrl,
 	getImageFromMarkdown,
+	unique,
 };

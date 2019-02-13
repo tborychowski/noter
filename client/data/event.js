@@ -27,6 +27,7 @@ export default {
 		selectedFolder: 'focus-selected-folder',
 		editor: 'focus-editor',
 		editorView: 'focus-editor-view',
+		updown: 'focus-note-up-down',
 	},
 
 	toast: {

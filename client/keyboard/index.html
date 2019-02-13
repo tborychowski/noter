@@ -24,15 +24,15 @@ export default {
 				Enter: editNote,
 				Backspace: delNote,
 				n: newNote,
-				ArrowUp: () => this.goto('up'),
-				ArrowDown: () => this.goto('down'),
-				ArrowRight: () => this.goto('right'),
-				ArrowLeft: () => this.goto('left'),
+				ArrowUp: e => this.goto(e, 'up'),
+				ArrowDown: e => this.goto(e, 'down'),
+				ArrowRight: e => this.goto(e, 'right'),
+				ArrowLeft: e => this.goto(e, 'left'),
 			};
-			if (keymap[ev.key] && !isEdit) keymap[ev.key]();
+			if (keymap[ev.key] && !isEdit) keymap[ev.key](ev);
 		},
 
-		goto (where) {
+		goto (ev, where) {
 			if (where === 'folders') return EVENT.fire(EVENT.focus.selectedFolder);
 			if (where === 'notes') return EVENT.fire(EVENT.focus.firstNote);
 
@@ -50,14 +50,8 @@ export default {
 			else if (where === 'right') {
 				if (isFolders) return EVENT.fire(EVENT.focus.firstNote);
 				if (isNotes) return EVENT.fire(EVENT.focus.editorView);
-
 			}
-
-			let newElem;
-			if (where === 'up') newElem = elem.previousElementSibling;
-			else if (where === 'down') newElem = elem.nextElementSibling;
-
-			if (newElem && newElem.matches('.list-item')) newElem.focus();
+			else EVENT.fire(EVENT.focus.updown, ev, where, elem);
 		},
 
 	}

@@ -6,6 +6,7 @@ const store = new Store({
 	notes: [],
 	folder: '',
 	note: null,
+	selectedNotes: [],
 	mode: 'view',
 	paletteVisible: false,
 });
