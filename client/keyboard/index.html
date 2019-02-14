@@ -51,7 +51,7 @@ export default {
 				if (isFolders) return EVENT.fire(EVENT.focus.firstNote);
 				if (isNotes) return EVENT.fire(EVENT.focus.editorView);
 			}
-			else EVENT.fire(EVENT.focus.updown, ev, where, elem);
+			else if (!isEditor) EVENT.fire(EVENT.focus.updown, ev, where, elem);
 		},
 
 	}

@@ -40,7 +40,7 @@
 .command-palette-list
 	position relative
 	width 100%
-	min-height 200px
+	min-height 100px
 	max-height 50vh
 	overflow-y auto
 	z-index 99
@@ -55,6 +55,9 @@
 	font-size 15px
 	line-height 1.6
 
+	b
+		color color-accent
+
 
 .item-name
 	color color-text-light2
@@ -62,8 +65,6 @@
 	align-items center
 	justify-content space-between
 
-	b
-		color color-accent
 
 	.pill
 		margin 0 0 0 10px
@@ -76,7 +77,6 @@
 	multiline-ellipsis(2)
 
 
-
 .command-palette-list-item.selected
 .command-palette-list-item:hover
 	background-color color-bg-dark0
@@ -84,10 +84,3 @@
 
 	.pill
 		background color-bg-dark3
-
-// .command-palette-list-item.selected
-// 	color color-text-dark0
-// 	background-color color-accent
-
-// 	.item-sub
-// 		color lighten(color-text-dark0, 1Z0%)
