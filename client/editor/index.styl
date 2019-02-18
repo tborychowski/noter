@@ -8,6 +8,10 @@
 	flex-flow column
 	line-height 1.4
 	margin 0 1px 1px 0
+	opacity 1
+	z-index 1
+	transition transform .3s ease-out
+
 
 	&:not(.edit):focus-within
 		outline 1px solid color-accent
@@ -133,9 +137,17 @@
 		border color-accent
 		border-width 1px 0 0 0
 
+	img
+		max-width 100%
 
 
 
+
+rot = -2deg
+zoom = 0.85
+.editor-clones
+	height 100%
+	display flex
 
 .editor-clone
 	box-shadow 1px 1px 5px 2px #0009
@@ -146,15 +158,29 @@
 	color alpha(color-text-light0, .6)
 	font-size 24px
 	font-weight 100
-	transform scale(0.9)
 
-rot = -2deg
+.editor-hidden
+	opacity 0
+	z-index -1
+	transform scale(zoom)
+
+.editor-clone.editor-hidden
+	transform scale(1)
+
+.editor-clone-main
+	transform scale(zoom)
 
 .editor-clone-1
-	transform scale(0.9) rotate(rot)
+	transform scale(zoom) rotate(rot)
 
 .editor-clone-2
-	transform scale(0.9) rotate(rot - 2deg)
+	transform scale(zoom) rotate(rot - 2deg)
 
 .editor-clone-3
-	transform scale(0.9) rotate(rot - 4deg)
+	transform scale(zoom) rotate(rot - 4deg)
+
+.editor-clone-4
+	transform scale(zoom) rotate(rot - 6deg)
+
+.editor-clone-5
+	transform scale(zoom) rotate(rot - 8deg)
