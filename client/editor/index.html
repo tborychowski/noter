@@ -125,8 +125,9 @@ export default {
 		},
 
 		newNote () {
-			const {mode, folder} = this.store.get();
+			let {mode, folder} = this.store.get();
 			if (mode !== 'view') return this.focusEditor();
+			if (folder === 'Bin') folder = '';
 			const note = { title: '', text: '', folder: folder || '' };
 			this.store.set({ note });
 		},
@@ -204,7 +205,10 @@ export default {
 				const delfn = (note.deleted_at ? 'del' : 'bin');
 				Data.Notes[delfn](id).then(res => {
 					this.close();
-					note.deleted_at = new Date();
+
+					if (delfn === 'bin') note.deleted_at = new Date();
+					else notes.splice(idx, 1);
+
 					this.store.set({ notes });
 					EVENT.fire(EVENT.toast.show, delfn === 'bin' ? 'Note moved to bin' : 'Note deleted');
 				});
