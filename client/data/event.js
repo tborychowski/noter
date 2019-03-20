@@ -24,7 +24,10 @@ export default {
 	focus: {
 		firstNote: 'focus-first-note',
 		selectedNote: 'focus-selected-note',
+
+		firstFolder: 'focus-first-folder',
 		selectedFolder: 'focus-selected-folder',
+
 		editor: 'focus-editor',
 		editorView: 'focus-editor-view',
 		updown: 'focus-note-up-down',

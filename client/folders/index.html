@@ -38,9 +38,14 @@ export default {
 		}
 	},
 	oncreate () {
+		EVENT.on(EVENT.focus.firstFolder, this.focusFirstFolder.bind(this));
 		EVENT.on(EVENT.focus.selectedFolder, this.focusSelectedFolder.bind(this));
 	},
 	methods: {
+		focusFirstFolder () {
+			document.querySelector('.folders .folder').focus();
+		},
+
 		focusSelectedFolder () {
 			document.querySelector('.folders .folder.selected').focus();
 		},

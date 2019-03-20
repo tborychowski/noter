@@ -211,6 +211,7 @@ export default {
 
 					this.store.set({ notes });
 					EVENT.fire(EVENT.toast.show, delfn === 'bin' ? 'Note moved to bin' : 'Note deleted');
+					EVENT.fire(EVENT.focus.firstNote);
 				});
 			}
 		},

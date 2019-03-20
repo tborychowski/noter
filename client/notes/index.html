@@ -73,10 +73,13 @@ export default {
 
 		focusFirstNote () {
 			const noteEl = document.querySelector('.notes .note');
-			if (!noteEl) return;
-			const note = this.getNoteFromEl(noteEl);
-			this.setSelectedNotes([note], true);
-			noteEl.focus();
+			if (noteEl) {
+				const note = this.getNoteFromEl(noteEl);
+				this.setSelectedNotes([note], true);
+				noteEl.focus();
+			}
+			// no notes - focus first folder
+			else EVENT.fire(EVENT.focus.firstFolder);
 		},
 
 		focusSelectedNote () {
