@@ -25,6 +25,30 @@
 			margin 0 10px 0 -4px
 
 
+
+.sorter
+	padding 0 10px
+	height 47px
+	border-bottom 5px solid #2e3440
+	display flex
+	flex-flow row
+	align-items center
+	justify-content space-between
+	color alpha(color-text-light0, .5)
+
+.sorter-btn
+	padding 0 5px
+	color inherit
+	text-decoration none
+
+	&.active
+		color color-accent
+		text-decoration underline
+
+	&:hover
+		color color-text-light0
+		text-decoration underline
+
 @media (max-width: 600px)
 	#app
 		left -10px
@@ -32,4 +56,3 @@
 		padding-left 25px
 	.notes
 		width 0
-

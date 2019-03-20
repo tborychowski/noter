@@ -3,7 +3,7 @@
 		{#each folders as folder}
 			<div
 				tabindex="0"
-				class="list-item folder {folder.name === $folder ? 'selected' : ''}"
+				class="list-item folder {folder.name === $folder ? 'selected' : ''} {folder.cls || ''}"
 				on:focus="open(folder.name)"
 				on:dragover="ondragenter(event)"
 				on:dragenter="ondragenter(event)"
@@ -33,7 +33,7 @@ export default {
 			for (let name in map) folders.push({ name, count: map[name] });
 			folders.sort((a, b) => a.name.localeCompare(b.name));
 			folders.unshift({ name: '', count: $notes.length - binned.length });
-			if (binned.length) folders.push({ name: 'Bin', count: binned.length });
+			if (binned.length) folders.push({ name: 'Bin', count: binned.length, cls: 'folder-bin' });
 			return folders;
 		}
 	},

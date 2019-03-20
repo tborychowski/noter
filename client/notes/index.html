@@ -1,4 +1,11 @@
 <div class="list notes">
+	<div class="sorter">
+		<span>{$notesInFolder.length} notes</span>
+		<span>Sort by:
+				<a class="sorter-btn {$sort.by === 'alpha'  ? 'active' : ''}" href="#" on:click="sortby(event, 'alpha')">A-Z</a> |
+				<a class="sorter-btn {$sort.by === 'recent' ? 'active' : ''}" href="#" on:click="sortby(event, 'recent')">Recent</a>
+		</span>
+	</div>
 	<div class="scroller" ref:notelistel>
 		{#each $notesInFolder as item}
 		<div
@@ -151,6 +158,14 @@ export default {
 		open (ev, note) {
 			if (this.store.get().mode === 'view') this.store.set({ note });
 			else EVENT.fire(EVENT.focus.editor);
+		},
+
+
+		sortby (ev, what) {
+			ev.stopPropagation();
+			const {sort} = this.store.get();
+			sort.by = what;
+			this.store.set({ sort });
 		}
 	}
 };

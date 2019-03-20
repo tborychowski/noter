@@ -9,6 +9,10 @@ const store = new Store({
 	selectedNotes: [],
 	mode: 'view',
 	paletteVisible: false,
+	sort: {
+		by: 'recent',
+		order: 'ASC',
+	},
 });
 
 
@@ -28,14 +32,19 @@ store.compute('markedNote', ['note'], (note) => {
 	return note;
 });
 
-store.compute('notesInFolder', ['folder', 'notes'], (folder, notes) => {
+
+const sortFn = {
+	alpha: (a, b) => a.title.localeCompare(b.title),
+	recent: (a, b) => b.updated_at.localeCompare(a.updated_at),
+};
+
+store.compute('notesInFolder', ['folder', 'notes', 'sort'], (folder, notes, sort) => {
 	if (folder) {
 		if (folder === 'Bin') notes = notes.filter(n => n.deleted_at);
 		else notes = notes.filter(n => n.folder === folder && !n.deleted_at);
 	}
 	else notes = notes.filter(n => !n.deleted_at);
-	// return notes.sort((a, b) => a.title.localeCompare(b.title));
-	return notes.sort((a, b) => b.updated_at.localeCompare(a.updated_at));
+	return notes.sort(sortFn[sort.by]);
 });
 
 
