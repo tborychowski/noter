@@ -1,9 +1,9 @@
 <div class="list notes">
 	<div class="sorter">
-		<span>{$notesInFolder.length} notes</span>
-		<span>Sort by:
-				<a class="sorter-btn {$sort.by === 'alpha'  ? 'active' : ''}" href="#" on:click="sortby(event, 'alpha')">A-Z</a> |
-				<a class="sorter-btn {$sort.by === 'recent' ? 'active' : ''}" href="#" on:click="sortby(event, 'recent')">Recent</a>
+		<span>{$folder || 'All Notes'} ({$notesInFolder.length})</span>
+		<span>
+			<a class="sorter-btn {$sort.by === 'alpha'  ? 'active' : ''}" href="#" on:click="sortby(event, 'alpha')">A-Z</a>
+			<a class="sorter-btn {$sort.by === 'recent' ? 'active' : ''}" href="#" on:click="sortby(event, 'recent')">Recent</a>
 		</span>
 	</div>
 	<div class="scroller" ref:notelistel>
@@ -18,8 +18,11 @@
 			on:dragstart="ondragstart(event, item)">
 				<div class="note-details">
 					<div class="note-title">{item.title}</div>
-					<div class="list-item-badge">{item.folder}</div>
-					<div class="list-item-badge">{timeAgo(item.updated_at)}</div>
+					<span class="note-info"><em>{timeAgo(item.updated_at)}</em></span>
+
+					{#if item.folder}
+					<span class="note-info">in: <em>{item.folder}</em></span>
+					{/if}
 				</div>
 				{#if item.thumb}
 					<div class="note-thumb" style="background-image: url('{item.thumb}')"></div>

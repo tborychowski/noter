@@ -55,7 +55,7 @@ function styl () {
 	const stylus = require('gulp-stylus');
 	const noop = require('through2').obj;
 
-	return src(['client/index.styl', 'client/**/*.styl'])
+	return src(['client/index.styl', 'client/ui-style/*.styl', 'client/**/*.styl'])
 		.pipe(isProd ? noop() : sourcemaps.init())
 		.pipe(stylus({ paths: ['client'], 'include css': true }))
 		.pipe(isProd ? cssmin({ keepSpecialComments: 0 }) : noop())
