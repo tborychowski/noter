@@ -1,0 +1,49 @@
+@import "lib"
+
+// NOTE STYLES
+.editor
+
+	a
+		color color-link0
+
+		&:hover
+			color color-link2
+
+	*[class^="ion-"]
+		font-size 18px
+		margin-right 5px
+		vertical-align middle
+		opacity 0.7
+
+	h1
+		font 24
+		padding 5 0
+		border-bottom 1px dotted color-accent
+	h2
+		font 22
+		border-bottom 1px dotted alpha(color-accent, 0.6)
+	h3
+		font 18
+	h4
+		font 16
+	h5
+		font 14
+
+	input[type=checkbox]
+		height 21px
+
+	hr
+		border color-accent
+		border-width 1px 0 0 0
+
+	img
+		max-width 100%
+
+
+	pre
+		background alpha(#000, .2)
+		padding 10
+		border-radius 4px
+		overflow-x auto
+		// white-space pre-wrap
+		// word-break break-all

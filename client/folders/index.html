@@ -51,7 +51,7 @@ export default {
 		},
 
 		open (folder) {
-			if (this.store.get().mode === 'view') this.store.set({ folder, note: null });
+			if (this.store.get().mode === 'view') this.store.set({ folder, note: null, selectedNotes: [] });
 			else EVENT.fire(EVENT.focus.editor);
 		},
 		onclick (ev, folder) {

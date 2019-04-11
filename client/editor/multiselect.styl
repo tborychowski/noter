@@ -1,0 +1,45 @@
+@import "lib"
+
+
+rot = -2deg
+zoom = 0.85
+.editor-clones
+	height 100%
+	display flex
+
+.editor-clone
+	box-shadow 1px 1px 5px 2px #0009
+	display flex
+	align-items center
+	justify-content center
+	flex-flow row
+	color alpha(color-text-light0, .6)
+	background color-bg-dark1
+	font-size 24px
+	font-weight 100
+
+.editor-hidden
+	opacity 0
+	z-index -1
+	transform scale(zoom)
+
+.editor-clone.editor-hidden
+	transform scale(1)
+
+.editor-clone-main
+	transform scale(zoom)
+
+.editor-clone-1
+	transform scale(zoom) rotate(rot)
+
+.editor-clone-2
+	transform scale(zoom) rotate(rot - 2deg)
+
+.editor-clone-3
+	transform scale(zoom) rotate(rot - 4deg)
+
+.editor-clone-4
+	transform scale(zoom) rotate(rot - 6deg)
+
+.editor-clone-5
+	transform scale(zoom) rotate(rot - 8deg)

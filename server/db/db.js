@@ -4,8 +4,7 @@ const logger = require('../lib/logger');
 
 const dbname = config.get('dbname');
 const sequelize = new Sequelize(`sqlite:${dbname}`, {
-	define: { timestamps: false, underscored: true },
-	operatorsAliases: false,
+	define: { timestamps: true, underscored: true },
 	logging: s => logger.debug(`DB: ${s}\n`)
 });
 
@@ -19,7 +18,12 @@ const Note = sequelize.define('note', {
 	title: { type: Sequelize.TEXT, allowNull: false, defaultValue: 'New note' },
 	url: { type: Sequelize.TEXT, defaultValue: '' },
 	text: { type: Sequelize.TEXT, defaultValue: '' },
-}, { timestamps: true, paranoid: true });
+}, {
+	createdAt: 'created_at',
+	updatedAt: 'updated_at',
+	deletedAt: 'deleted_at',
+	paranoid: true
+});
 
 
 const init = () => sequelize.sync();

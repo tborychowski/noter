@@ -51,13 +51,6 @@
 	label
 		width 60px
 
-	pre
-		background color-bg-dark0
-		padding 10
-		border-radius 4px
-		overflow-x auto
-		// white-space pre-wrap
-		// word-break break-all
 
 	.note-title
 		padding 0 10
@@ -98,90 +91,3 @@
 .editor.view .editor-header-row.edit
 .editor.edit .editor-header-row.view
 	display none
-
-
-
-// NOTE STYLES
-.editor
-
-	a
-		color color-link0
-
-		&:hover
-			color color-link2
-
-	*[class^="ion-"]
-		font-size 18px
-		margin-right 5px
-		vertical-align middle
-		opacity 0.7
-
-	h1
-		font 24
-		padding 5 0
-		border-bottom 1px dotted color-accent
-	h2
-		font 22
-		border-bottom 1px dotted alpha(color-accent, 0.6)
-	h3
-		font 18
-	h4
-		font 16
-	h5
-		font 14
-
-	input[type=checkbox]
-		height 21px
-
-	hr
-		border color-accent
-		border-width 1px 0 0 0
-
-	img
-		max-width 100%
-
-
-
-
-rot = -2deg
-zoom = 0.85
-.editor-clones
-	height 100%
-	display flex
-
-.editor-clone
-	box-shadow 1px 1px 5px 2px #0009
-	display flex
-	align-items center
-	justify-content center
-	flex-flow row
-	color alpha(color-text-light0, .6)
-	background color-bg-dark1
-	font-size 24px
-	font-weight 100
-
-.editor-hidden
-	opacity 0
-	z-index -1
-	transform scale(zoom)
-
-.editor-clone.editor-hidden
-	transform scale(1)
-
-.editor-clone-main
-	transform scale(zoom)
-
-.editor-clone-1
-	transform scale(zoom) rotate(rot)
-
-.editor-clone-2
-	transform scale(zoom) rotate(rot - 2deg)
-
-.editor-clone-3
-	transform scale(zoom) rotate(rot - 4deg)
-
-.editor-clone-4
-	transform scale(zoom) rotate(rot - 6deg)
-
-.editor-clone-5
-	transform scale(zoom) rotate(rot - 8deg)
