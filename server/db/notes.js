@@ -2,7 +2,7 @@ const {Note} = require('./db');
 
 
 function getOne (id) {
-	return Note.findById(id);
+	return Note.findByPk(id);
 }
 
 function get (query) {

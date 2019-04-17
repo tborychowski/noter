@@ -6,7 +6,7 @@ function req (url, method = 'GET', params) {
 	};
 	if (params) {
 		opts.body = JSON.stringify(params);
-		if (params.id) url += `/${params.id}`;
+		if (params.id && typeof params.id === 'string') url += `/${params.id}`;
 	}
 	return fetch(`api/${url}`, opts).then(res => res.json());
 }
@@ -28,19 +28,19 @@ const Notes = {
 		return get(this.base);
 	},
 	getOne (id) {
-		return get(`${this.base}/${id}`);
+		return get(this.base, { id });
 	},
 	save (data) {
 		return save(this.base, data);
 	},
 	bin (id) {
-		return del(`${this.base}/${id}`);
+		return del(this.base, { id });
 	},
-	del (id) {
-		return del(`${this.base}/${id}`, { force: true });
+	del (id = '') {
+		return del(this.base, { id, force: true });
 	},
 	undelete (id) {
-		return del(`${this.base}/${id}`, { restore: true });
+		return del(this.base, { id, restore: true });
 	},
 };
 

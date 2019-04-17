@@ -32,7 +32,7 @@ function put (req, res) {
 
 // delete
 function del (req, res) {
-	return DB.del(req.params.id, req.body)
+	return DB.del(req.body.id || req.params.id, req.body)
 		.then(count => res.status(200).json({ deleted: count }))
 		.catch(e => res.status(500).json(e));
 }

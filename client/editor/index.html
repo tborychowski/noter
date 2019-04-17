@@ -20,7 +20,7 @@
 					{/if}
 				</div>
 				{#if $markedNote.deleted_at}
-				<button type="button" class="btn-icon ion-md-undo btn-edit" on:click="undelete($markedNote.id)" title="Undelete (u)"></button>
+				<button type="button" class="btn-icon ion-md-undo btn-edit" on:click="undelete()" title="Undelete (u)"></button>
 				{/if}
 				<button type="button" class="btn-icon ion-md-create btn-edit" on:click="edit($markedNote)" title="Edit (e)"></button>
 			</div>
@@ -34,7 +34,7 @@
 				<div class="flex-filler"></div>
 				<button type="submit" class="btn-icon ion-md-checkmark btn-save success" title="Save (Enter)"></button>
 				{#if note.id}
-					<button type="button" class="btn-icon ion-md-trash btn-remove danger" on:click="del(note.id)" title="Move to bin"></button>
+					<button type="button" class="btn-icon ion-md-trash btn-remove danger" on:click="del()" title="Move to bin"></button>
 				{/if}
 				<button type="button" class="btn-icon ion-md-close btn-cancel" on:click="cancel()" title="Cancel (Esc)"></button>
 			</div>
@@ -181,36 +181,49 @@ export default {
 			this.store.set({ notes, note });
 		},
 
-		undelete (id) {
-			if (!id) id = this.store.get().note.id;
-			if (!id) return;
-			const notes = this.store.get().notes;
-			const idx = notes.findIndex(n => n.id === id);
-			const note = notes[idx];
-			Data.Notes.undelete(id).then(res => {
-				delete note.deleted_at;
-				this.store.set({ notes, folder: '', note });
-				EVENT.fire(EVENT.toast.show, 'Note restored');
+		undelete () {
+			const {notes, selectedNotes} = this.store.get();
+			if (!selectedNotes.length) return;
+
+			const ids = selectedNotes.map(n => n.id);
+
+			Data.Notes.undelete(ids).then(res => {
+				selectedNotes.forEach(selectedNote => {
+					const idx = notes.findIndex(n => n.id === selectedNote.id);
+					const note = notes[idx];
+					delete note.deleted_at;
+				});
+				this.store.set({ notes, folder: '', note: null });
+				const noteMsg = selectedNotes.length > 1 ? 'Notes' : 'Note';
+				EVENT.fire(EVENT.toast.show, `${noteMsg} restored`);
 				EVENT.fire(EVENT.focus.selectedNote);
 			});
 		},
 
-		del (id) {
-			if (!id) id = this.store.get().note.id;
-			if (!id) return;
-			const notes = this.store.get().notes;
-			const idx = notes.findIndex(n => n.id === id);
-			const note = notes[idx];
-			if (window.confirm(`Are you sure you wish to delete "${note.title}"`)) {
-				const delfn = (note.deleted_at ? 'del' : 'bin');
-				Data.Notes[delfn](id).then(res => {
+		del () {
+			const {notes, selectedNotes} = this.store.get();
+			if (!selectedNotes.length) return;
+
+			const q = selectedNotes.length > 1 ? `${selectedNotes.length} notes` : `"${selectedNotes[0].title}"`;
+
+			if (window.confirm(`Are you sure you wish to delete ${q}?`)) {
+				const delfn = (selectedNotes[0].deleted_at ? 'del' : 'bin');
+				const ids = selectedNotes.map(n => n.id);
+
+				Data.Notes[delfn](ids).then(res => {
 					this.close();
 
-					if (delfn === 'bin') note.deleted_at = new Date();
-					else notes.splice(idx, 1);
+					selectedNotes.forEach(selectedNote => {
+						const idx = notes.findIndex(n => n.id === selectedNote.id);
+						const note = notes[idx];
+
+						if (delfn === 'bin') note.deleted_at = new Date();
+						else notes.splice(idx, 1);
+					});
 
 					this.store.set({ notes });
-					EVENT.fire(EVENT.toast.show, delfn === 'bin' ? 'Note moved to bin' : 'Note deleted');
+					const noteMsg = selectedNotes.length > 1 ? 'Notes' : 'Note';
+					EVENT.fire(EVENT.toast.show, delfn === 'bin' ? `${noteMsg} to bin` : `${noteMsg} deleted`);
 					EVENT.fire(EVENT.focus.firstNote);
 				});
 			}
