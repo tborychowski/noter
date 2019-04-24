@@ -16,7 +16,7 @@
 		"body-parser": "^1.18.3",
 		"config": "^3.1.0",
 		"express": "^4.16.4",
-		"sequelize": "^5.3.1",
+		"sequelize": "^5.7.5",
 		"sqlite3": "^4.0.6",
 		"winston": "^3.2.1"
 	},
@@ -27,8 +27,8 @@
 		"babel-preset-env": "^1.7.0",
 		"chalk": "^2.4.2",
 		"connect-livereload": "^0.6.1",
-		"gulp": "^4.0.0",
-		"gulp-clean-css": "^4.0.0",
+		"gulp": "^4.0.1",
+		"gulp-clean-css": "^4.2.0",
 		"gulp-concat": "^2.6.1",
 		"gulp-env": "^0.4.0",
 		"gulp-eslint": "^5.0.0",
@@ -44,7 +44,7 @@
 		"svelte": "^2.16.1",
 		"svelte-loader": "^2.13.3",
 		"through2": "^3.0.1",
-		"webpack": "^4.29.6",
+		"webpack": "^4.30.0",
 		"webpack-stream": "^5.2.1"
 	}
 }
