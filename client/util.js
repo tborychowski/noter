@@ -66,10 +66,13 @@ function setUrl ({ folder, note }) {
 	location.hash = path;
 }
 
-function getStateFromUrl () {
+
+
+function setStateFromUrl (_folder, _note) {
 	let [folder, note] = location.hash.substr(2).split('/');
 	if (note) note = { id: +note };
-	return { folder, note };
+	if (folder) _folder.set(folder);
+	if (note) _note.set(note);
 }
 
 
@@ -98,7 +101,7 @@ export {
 	timeAgo,
 	slugify,
 	setUrl,
-	getStateFromUrl,
+	setStateFromUrl,
 	getImageFromMarkdown,
 	unique,
 };

@@ -1,32 +1,32 @@
 <Header/>
 <Folders/>
 <Notes/>
-<Editor/>
+<!-- <Editor/> -->
 <Palette/>
 <Keyboard/>
 <Toaster/>
 
 <script>
-import {Store, EVENT} from '../data';
-import {setUrl, getStateFromUrl} from '../util';
+import Header from '../header';
+import Palette from '../palette';
+import Toaster from '../toaster';
+import Keyboard from '../keyboard';
+import Folders from '../folders';
+import Notes from '../notes';
+// import Editor from '../editor';
+import { onMount } from 'svelte';
+import { EVENT } from '../data';
+import { folder, note } from '../stores';
+import { setUrl, setStateFromUrl } from '../util';
 
-export default {
-	components: {
-		Header: '../header',
-		Folders: '../folders',
-		Notes: '../notes',
-		Editor: '../editor',
-		Palette: '../palette',
-		Keyboard: '../keyboard',
-		Toaster: '../toaster',
-	},
-	store: () => Store,
-	oncreate () {
-		this.store.on('state', ({ changed, current }) => setUrl(current));
-		this.store.set(getStateFromUrl());
-		EVENT.fire(EVENT.notes.load);
-	},
 
-};
+onMount(async () => {
+	folder.subscribe(folder => setUrl({folder}));
+	note.subscribe(note => setUrl({note}));
+	setStateFromUrl(folder, note);
+
+	setTimeout(() => EVENT.fire(EVENT.notes.load));
+});
+
 
 </script>

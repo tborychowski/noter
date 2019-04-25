@@ -1,7 +1,27 @@
 <script>
+import {onMount} from 'svelte';
 import CommandPalette from './command-palette';
-import {Store, EVENT} from '../data';
+import {EVENT} from '../data';
 import {timeAgo} from '../util';
+import {notes, note, folder, paletteVisible} from '../stores';
+
+export let palette;
+
+onMount(() => {
+	palette = new CommandPalette({
+		searchInFields: ['title', 'folder', 'text'],
+		dataSrc: () => $notes,
+		itemRenderer
+	});
+
+	palette
+		.on('show', () => paletteVisible.set(true))
+		.on('hide', () => paletteVisible.set(false))
+		.on('action', onNoteSelect);
+
+	EVENT.on(EVENT.palette.show, () => palette.open());
+});
+
 
 function itemRenderer ({title, text, folder, updated_at, highlighted}) {
 	if (highlighted) {
@@ -19,29 +39,10 @@ function itemRenderer ({title, text, folder, updated_at, highlighted}) {
 }
 
 
-export default {
-	store: () => Store,
-	oncreate () {
-		this.palette = new CommandPalette({
-			searchInFields: ['title', 'folder', 'text'],
-			dataSrc: () => this.store.get().notes,
-			itemRenderer
-		});
+function onNoteSelect (note) {
+	note.set(note);
+	folder.set('');
+	setTimeout(() => EVENT.fire(EVENT.focus.selectedNote), 10);
+}
 
-		this.palette
-			.on('show', () => this.store.set({ paletteVisible: true }))
-			.on('hide', () => this.store.set({ paletteVisible: false }))
-			.on('action', this.onNoteSelect.bind(this));
-
-		EVENT.on(EVENT.palette.show, () => this.palette.open());
-	},
-
-	methods: {
-		onNoteSelect (note) {
-			this.store.set({ note, folder: '' });
-			setTimeout(() => EVENT.fire(EVENT.focus.selectedNote), 10);
-		},
-
-	}
-};
 </script>

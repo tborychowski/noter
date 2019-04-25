@@ -77,7 +77,7 @@ function js () {
 			path: path.join(__dirname, 'public'),
 			publicPath: './public/',
 		},
-		resolve: { extensions: ['.js', '.json', '.html'] },
+		resolve: { extensions: ['.mjs', '.js', '.json', '.html'] },
 		stats: 'normal',	// minimal
 		module: {
 			rules: [
