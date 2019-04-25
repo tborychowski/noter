@@ -1,7 +1,7 @@
 <Header/>
 <Folders/>
 <Notes/>
-<!-- <Editor/> -->
+<Editor/>
 <Palette/>
 <Keyboard/>
 <Toaster/>
@@ -13,7 +13,7 @@ import Toaster from '../toaster';
 import Keyboard from '../keyboard';
 import Folders from '../folders';
 import Notes from '../notes';
-// import Editor from '../editor';
+import Editor from '../editor';
 import { onMount } from 'svelte';
 import { EVENT } from '../data';
 import { folder, note } from '../stores';
@@ -21,8 +21,8 @@ import { setUrl, setStateFromUrl } from '../util';
 
 
 onMount(async () => {
-	folder.subscribe(folder => setUrl({folder}));
-	note.subscribe(note => setUrl({note}));
+	folder.subscribe(() => setUrl($folder, $note));
+	note.subscribe(() => setUrl($folder, $note));
 	setStateFromUrl(folder, note);
 
 	setTimeout(() => EVENT.fire(EVENT.notes.load));

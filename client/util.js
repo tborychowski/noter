@@ -57,7 +57,7 @@ function slugify (text) {
 }
 
 
-function setUrl ({ folder, note }) {
+function setUrl (folder, note) {
 	const chunks = [];
 	if (folder !== null) chunks.push(folder);
 	if (note) chunks.push(note.id);

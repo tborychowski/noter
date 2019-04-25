@@ -17,7 +17,7 @@
 			draggable="true"
 			tabindex="0"
 			on:focus="{e => open(e, item)}"
-			on:mousedown="{e => select(e, item, this)}"
+			on:mousedown="{e => select(e, item)}"
 			on:dragstart="{e => ondragstart(e, item)}">
 				<div class="note-details">
 					<div class="note-title">{item.title}</div>
@@ -54,9 +54,11 @@ onMount(() => {
 });
 
 
-function isSelected (item, selectedNotes) {
-	if (!selectedNotes.length || !item) return false;
-	return !!selectedNotes.find(n => n.id === item.id);
+function isSelected (item, _selectedNotes) {
+	if (!_selectedNotes.length || !item) return false;
+	return !!_selectedNotes.find(n => {
+		return n.id === item.id;
+	});
 }
 
 
@@ -99,20 +101,19 @@ function focusSelectedNote () {
 
 function select (ev, item) {
 	if (ev.shiftKey) {
-		let note = $note;
-		const noteEl = ev.target;
-		let notesInFolder = $notesInFolder;
-		const selectedNotes = [];
+		const noteEl = ev.target.closest('.note');
+		const _selectedNotes = [];
 		const noteArray = Array.from(noteEl.parentNode.children);
 		const noteIdx = noteArray.indexOf(noteEl);
-		const focusedEl = getElFromNote(note);
+		const focusedEl = getElFromNote($note);
 		const focusedIdx = noteArray.indexOf(focusedEl);
 		const from = Math.min(focusedIdx, noteIdx);
 		const to = Math.max(focusedIdx, noteIdx);
+
 		for (let i = from; i <= to; i += 1) {
-			selectedNotes.push(notesInFolder[i]);
+			_selectedNotes.push($notesInFolder[i]);
 		}
-		setSelectedNotes(selectedNotes);
+		setSelectedNotes(_selectedNotes);
 	}
 	else if (ev.metaKey) toggleSelectedNotes([item]);
 	else setSelectedNotes([item], true);
@@ -129,17 +130,17 @@ function getNoteFromEl (el) {
 }
 
 function toggleSelectedNotes (items) {
-	let selectedNotes = $selectedNotes;
+	let _selectedNotes = $selectedNotes;
 	items.forEach(item => {
-		const idx = selectedNotes.indexOf(item);
-		if (idx > -1) selectedNotes.splice(idx, 1);
-		else selectedNotes.push(item);
+		const idx = _selectedNotes.indexOf(item);
+		if (idx > -1) _selectedNotes.splice(idx, 1);
+		else _selectedNotes.push(item);
 	});
-	setSelectedNotes(selectedNotes, true);
+	setSelectedNotes(_selectedNotes, true);
 }
 
 function setSelectedNotes (notes, replace) {
-	let _selectedNotes = $selectedNotes;
+	let _selectedNotes = Array.from($selectedNotes);
 	if (replace) _selectedNotes = [];
 	_selectedNotes.push(...new Set(notes));
 	selectedNotes.set(unique(_selectedNotes));
