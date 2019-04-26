@@ -1,7 +1,7 @@
 <script>
 import { onMount } from 'svelte';
 import {EVENT} from '../data';
-import {paletteVisible, mode, note} from '../stores';
+import {paletteVisible, mode, note} from '../data/store';
 
 onMount(() => {
 	document.addEventListener('keydown', onkeydown);

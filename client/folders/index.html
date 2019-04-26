@@ -19,7 +19,7 @@
 <script>
 import {onMount} from 'svelte';
 import {Data, EVENT} from '../data';
-import {notes, note, folder, folders, selectedNotes, mode} from '../stores';
+import {notes, note, folder, folders, selectedNotes, mode} from '../data/store';
 
 onMount(() => {
 	EVENT.on(EVENT.focus.firstFolder, focusFirstFolder);
