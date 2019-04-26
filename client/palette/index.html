@@ -39,8 +39,8 @@ function itemRenderer ({title, text, folder, updated_at, highlighted}) {
 }
 
 
-function onNoteSelect (note) {
-	note.set(note);
+function onNoteSelect (_note) {
+	note.set(_note);
 	folder.set('');
 	setTimeout(() => EVENT.fire(EVENT.focus.selectedNote), 10);
 }

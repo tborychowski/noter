@@ -123,8 +123,9 @@ function onkeydown (ev) {
 function newNote () {
 	if ($mode !== 'view') return focusEditor();
 	if ($folder === 'Bin') folder = '';
-	const note = { title: '', text: '', folder: $folder || '' };
-	note.set(note);
+	const _note = { title: '', text: '', folder: $folder || '' };
+	note.set(_note);
+	edit();
 }
 
 function checkEditMode () {
@@ -183,12 +184,12 @@ function undelete () {
 	Data.Notes.undelete(ids).then(res => {
 		$selectedNotes.forEach(selectedNote => {
 			const idx = $notes.findIndex(n => n.id === selectedNote.id);
-			const note = $notes[idx];
-			delete note.deleted_at;
+			const _note = $notes[idx];
+			delete _note.deleted_at;
 		});
 		notes.set($notes);
 		folder.set('');
-		note.set(null);
+		// note.set(null);
 
 
 		const noteMsg = $selectedNotes.length > 1 ? 'Notes' : 'Note';
@@ -211,15 +212,15 @@ function del () {
 
 			$selectedNotes.forEach(selectedNote => {
 				const idx = $notes.findIndex(n => n.id === selectedNote.id);
-				const note = $notes[idx];
+				const _note = $notes[idx];
 
-				if (delfn === 'bin') note.deleted_at = new Date();
+				if (delfn === 'bin') _note.deleted_at = new Date();
 				else $notes.splice(idx, 1);
 			});
 
 			notes.set($notes);
 			const noteMsg = $selectedNotes.length > 1 ? 'Notes' : 'Note';
-			EVENT.fire(EVENT.toast.show, delfn === 'bin' ? `${noteMsg} to bin` : `${noteMsg} deleted`);
+			EVENT.fire(EVENT.toast.show, delfn === 'bin' ? `${noteMsg} moved to bin` : `${noteMsg} deleted`);
 			EVENT.fire(EVENT.focus.firstNote);
 		});
 	}

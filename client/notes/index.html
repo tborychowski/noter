@@ -1,5 +1,3 @@
-<span>{$folder || 'All Notes'}</span>
-
 <div class="list notes">
 	<div class="notes-header">
 		<span>{$folder || 'All Notes'} ({$notesInFolder && $notesInFolder.length || 0})</span>
@@ -84,8 +82,8 @@ function ondragstart (ev, item) {
 function focusFirstNote () {
 	const noteEl = document.querySelector('.notes .note');
 	if (noteEl) {
-		const note = getNoteFromEl(noteEl);
-		setSelectedNotes([note], true);
+		const _note = getNoteFromEl(noteEl);
+		if (_note) setSelectedNotes([_note], true);
 		noteEl.focus();
 	}
 	// no notes - focus first folder
@@ -93,9 +91,8 @@ function focusFirstNote () {
 }
 
 function focusSelectedNote () {
-	const note = $note;
-	const noteEl = getElFromNote(note);
-	if (note) setSelectedNotes([note], true);
+	const noteEl = getElFromNote($note);
+	if ($note) setSelectedNotes([$note], true);
 	if (noteEl) noteEl.focus();
 }
 
@@ -119,14 +116,13 @@ function select (ev, item) {
 	else setSelectedNotes([item], true);
 }
 
-function getElFromNote (note) {
-	return notelistel.querySelector('.note-' + note.id);
+function getElFromNote (_note) {
+	return notelistel.querySelector('.note-' + _note.id);
 }
 
 function getNoteFromEl (el) {
-	const notesInFolder = $notesInFolder;
 	const id = parseInt(el.dataset.id, 10) || null;
-	return notesInFolder.find(n => n.id === id);
+	return $notesInFolder.find(n => n.id === id);
 }
 
 function toggleSelectedNotes (items) {
@@ -139,10 +135,10 @@ function toggleSelectedNotes (items) {
 	setSelectedNotes(_selectedNotes, true);
 }
 
-function setSelectedNotes (notes, replace) {
+function setSelectedNotes (_notes, replace) {
 	let _selectedNotes = Array.from($selectedNotes);
 	if (replace) _selectedNotes = [];
-	_selectedNotes.push(...new Set(notes));
+	_selectedNotes.push(...new Set(_notes));
 	selectedNotes.set(unique(_selectedNotes));
 }
 
@@ -156,10 +152,10 @@ function focusNoteUpDown (ev, where, elem) {
 	if (!newElem) return;
 
 	if (elem.closest('.notes')) {
-		const notes = [];
-		if (ev.shiftKey) notes.push(getNoteFromEl(elem));
-		notes.push(getNoteFromEl(newElem));
-		setSelectedNotes(notes, !ev.shiftKey);
+		const _notes = [];
+		if (ev.shiftKey) _notes.push(getNoteFromEl(elem));
+		_notes.push(getNoteFromEl(newElem));
+		setSelectedNotes(_notes, !ev.shiftKey);
 	}
 
 	if (newElem && newElem.matches('.list-item')) newElem.focus();

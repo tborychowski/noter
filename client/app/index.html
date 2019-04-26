@@ -23,7 +23,7 @@ import { setUrl, setStateFromUrl } from '../util';
 onMount(async () => {
 	folder.subscribe(() => setUrl($folder, $note));
 	note.subscribe(() => setUrl($folder, $note));
-	setStateFromUrl(folder, note);
+	setStateFromUrl($folder, $note);
 
 	setTimeout(() => EVENT.fire(EVENT.notes.load));
 });

@@ -60,12 +60,12 @@ function ondrop (ev, folder) {
 	ev.target.classList.remove('drag-over');
 
 	const itemId = +ev.dataTransfer.getData('itemId');
-	const notes = $notes;
-	const note = notes.find(note => note.id === itemId);
-	note.folder = folder;
+	const _notes = $notes;
+	const _note = _notes.find(n => n.id === itemId);
+	_note.folder = folder;
 
-	Data.Notes.save(note).then(res => {
-		notes.set(notes);
+	Data.Notes.save(_note).then(res => {
+		notes.set(_notes);
 	});
 }
 

@@ -68,11 +68,10 @@ function setUrl (folder, note) {
 
 
 
-function setStateFromUrl (_folder, _note) {
-	let [folder, note] = location.hash.substr(2).split('/');
-	if (note) note = { id: +note };
-	if (folder) _folder.set(folder);
-	if (note) _note.set(note);
+function setStateFromUrl (folder, note) {
+	let [_folder, _note] = location.hash.substr(2).split('/');
+	if (_folder) folder.set(_folder);
+	if (_note) note.set({ id: +_note });
 }
 
 
