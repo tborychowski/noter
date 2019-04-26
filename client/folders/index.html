@@ -1,87 +1,72 @@
 <div class="list folders">
-	<div class="scroller" ref:list>
-		{#each folders as folder}
+	<div class="scroller" bind:this={list}>
+		{#each $folders as item}
 			<div
 				tabindex="0"
-				class="list-item folder {folder.name === $folder ? 'selected' : ''} {folder.cls || ''}"
-				on:focus="open(folder.name)"
-				on:dragover="ondragenter(event)"
-				on:dragenter="ondragenter(event)"
-				on:dragleave="ondragleave(event)"
-				on:drop="ondrop(event, folder.name)">
-					{folder.name || 'All Notes'}
-					<span class="list-item-badge">{folder.count}</span>
+				class="list-item folder {item.name === $folder ? 'selected' : ''} {item.cls || ''}"
+				on:focus="{e => open(item.name)}"
+				on:dragover="{ondragenter}"
+				on:dragenter="{ondragenter}"
+				on:dragleave="{ondragleave}"
+				on:drop="{e => ondrop(e, item.name)}">
+					{item.name || 'All Notes'}
+					<span class="list-item-badge">{item.count}</span>
 				</div>
 		{/each}
 	</div>
 </div>
 
 <script>
-import {Data, Store, EVENT} from '../data';
-export default {
-	store: () => Store,
-	computed: {
-		folders ({$notes}) {
-			const map = {};
-			const folders = [];
-			const binned = $notes.filter(n => n.deleted_at);
-			const all = $notes.filter(n => !n.deleted_at);
+import {onMount} from 'svelte';
+import {Data, EVENT} from '../data';
+import {notes, note, folder, folders, selectedNotes, mode} from '../stores';
 
-			for (let note of all) {
-				if (note.folder) map[note.folder] = (map[note.folder] || 0) + 1;
-			}
-			for (let name in map) folders.push({ name, count: map[name] });
-			folders.sort((a, b) => a.name.localeCompare(b.name));
-			folders.unshift({ name: '', count: $notes.length - binned.length });
-			if (binned.length) folders.push({ name: 'Bin', count: binned.length, cls: 'folder-bin' });
-			return folders;
-		}
-	},
-	oncreate () {
-		EVENT.on(EVENT.focus.firstFolder, this.focusFirstFolder.bind(this));
-		EVENT.on(EVENT.focus.selectedFolder, this.focusSelectedFolder.bind(this));
-	},
-	methods: {
-		focusFirstFolder () {
-			document.querySelector('.folders .folder').focus();
-		},
+onMount(() => {
+	EVENT.on(EVENT.focus.firstFolder, focusFirstFolder);
+	EVENT.on(EVENT.focus.selectedFolder, focusSelectedFolder);
+});
 
-		focusSelectedFolder () {
-			document.querySelector('.folders .folder.selected').focus();
-		},
+let list;
 
-		open (folder) {
-			if (this.store.get().mode === 'view') this.store.set({ folder, note: null, selectedNotes: [] });
-			else EVENT.fire(EVENT.focus.editor);
-		},
-		onclick (ev, folder) {
-			ev.preventDefault();
-			this.open(folder);
-		},
 
-		ondragenter (ev) {
-			ev.preventDefault();
-			ev.target.classList.add('drag-over');
-		},
+function focusFirstFolder () {
+	document.querySelector('.folders .folder').focus();
+}
 
-		ondragleave (ev) {
-			ev.target.classList.remove('drag-over');
-		},
+function focusSelectedFolder () {
+	document.querySelector('.folders .folder.selected').focus();
+}
 
-		ondrop (ev, folder) {
-			ev.preventDefault();
-			ev.target.classList.remove('drag-over');
-
-			const itemId = +ev.dataTransfer.getData('itemId');
-			const notes = this.store.get().notes;
-			const note = notes.find(note => note.id === itemId);
-			note.folder = folder;
-
-			Data.Notes.save(note).then(res => {
-				this.store.set({ notes });
-			});
-		},
-
+function open (_folder) {
+	if ($mode === 'view') {
+		folder.set(_folder);
+		note.set(null);
+		selectedNotes.set([]);
 	}
-};
+	else EVENT.fire(EVENT.focus.editor);
+}
+
+function ondragenter (ev) {
+	ev.preventDefault();
+	ev.target.classList.add('drag-over');
+}
+
+function ondragleave (ev) {
+	ev.target.classList.remove('drag-over');
+}
+
+function ondrop (ev, folder) {
+	ev.preventDefault();
+	ev.target.classList.remove('drag-over');
+
+	const itemId = +ev.dataTransfer.getData('itemId');
+	const _notes = $notes;
+	const _note = _notes.find(n => n.id === itemId);
+	_note.folder = folder;
+
+	Data.Notes.save(_note).then(res => {
+		notes.set(_notes);
+	});
+}
+
 </script>

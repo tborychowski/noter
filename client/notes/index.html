@@ -1,21 +1,22 @@
 <div class="list notes">
 	<div class="notes-header">
-		<span>{$folder || 'All Notes'} ({$notesInFolder.length})</span>
+		<span>{$folder || 'All Notes'} ({$notesInFolder && $notesInFolder.length || 0})</span>
 		<span>
-			<a class="sorter-btn {$sort.by === 'alpha'  ? 'active' : ''}" href="#" on:click="sortby(event, 'alpha')">A-Z</a>
-			<a class="sorter-btn {$sort.by === 'recent' ? 'active' : ''}" href="#" on:click="sortby(event, 'recent')">Recent</a>
+			<a class="sorter-btn {$sort.by === 'alpha'  ? 'active' : ''}" href="#" on:click="{e => sortby(e, 'alpha')}">A-Z</a>
+			<a class="sorter-btn {$sort.by === 'recent' ? 'active' : ''}" href="#" on:click="{e => sortby(e, 'recent')}">Recent</a>
 		</span>
 	</div>
-	<div class="scroller" ref:notelistel>
+	<div class="scroller" bind:this={notelistel}>
+		{#if $notesInFolder}
 		{#each $notesInFolder as item}
 		<div
 			class="list-item note {isSelected(item, $selectedNotes) ? 'selected' : ''} note-{item.id}"
 			data-id="{item.id}"
 			draggable="true"
 			tabindex="0"
-			on:focus="open(event, item)"
-			on:mousedown="select(event, item, this)"
-			on:dragstart="ondragstart(event, item)">
+			on:focus="{e => open(e, item)}"
+			on:mousedown="{e => select(e, item)}"
+			on:dragstart="{e => ondragstart(e, item)}">
 				<div class="note-details">
 					<div class="note-title">{item.title}</div>
 					<span class="note-info"><em>{timeAgo(item.updated_at)}</em></span>
@@ -29,150 +30,154 @@
 				{/if}
 		</div>
 		{/each}
+		{/if}
 	</div>
 </div>
 
 
 <script>
-import {Data, Store, EVENT} from '../data';
+import {onMount, tick} from 'svelte';
+import {Data, EVENT} from '../data';
+import {folder, notesInFolder, selectedNotes, sort, notes, note, mode} from '../stores';
 import {timeAgo, getImageFromMarkdown, unique} from '../util';
 
-export default {
-	store: () => Store,
-	helpers: {
-		isSelected (item, selectedNotes) {
-			if (!selectedNotes.length || !item) return false;
-			return !!selectedNotes.find(n => n.id === item.id);
-		},
-		timeAgo
-	},
-	oncreate () {
-		EVENT.on(EVENT.notes.load, this.load.bind(this));
-		EVENT.on(EVENT.focus.firstNote, this.focusFirstNote.bind(this));
-		EVENT.on(EVENT.focus.selectedNote, this.focusSelectedNote.bind(this));
-		EVENT.on(EVENT.focus.updown, this.focusNoteUpDown.bind(this));
-		EVENT.on(EVENT.focus.selectedFolder, this.unselectNotes.bind(this));
-	},
-	methods: {
-		load () {
-			Data.Notes.get().then(notes => {
-				notes.forEach(n => { n.thumb = getImageFromMarkdown(n.text); });
+let notelistel;
 
-				this.store.set({ notes });
-
-				const selectedNote = this.store.get().note;
-				if (selectedNote && selectedNote.id && !selectedNote.title) {
-					const note = notes.find(n => n.id === selectedNote.id);
-					this.store.set({ note });
-					EVENT.fire(EVENT.focus.selectedNote);
-				}
-			});
-
-		},
-
-		ondragstart (ev, item) {
-			ev.dataTransfer.setData('itemId', item.id);
-		},
-
-		focusFirstNote () {
-			const noteEl = document.querySelector('.notes .note');
-			if (noteEl) {
-				const note = this.getNoteFromEl(noteEl);
-				this.setSelectedNotes([note], true);
-				noteEl.focus();
-			}
-			// no notes - focus first folder
-			else EVENT.fire(EVENT.focus.firstFolder);
-		},
-
-		focusSelectedNote () {
-			const {note} = this.store.get();
-			const noteEl = this.getElFromNote(note);
-			if (note) this.setSelectedNotes([note], true);
-			if (noteEl) noteEl.focus();
-		},
-
-		select (ev, item, noteEl) {
-			if (ev.shiftKey) {
-				let {note, notesInFolder} = this.store.get()
-				const selectedNotes = [];
-				const noteArray = Array.from(noteEl.parentNode.children);
-				const noteIdx = noteArray.indexOf(noteEl);
-				const focusedEl = this.getElFromNote(note);
-				const focusedIdx = noteArray.indexOf(focusedEl);
-				const from = Math.min(focusedIdx, noteIdx);
-				const to = Math.max(focusedIdx, noteIdx);
-				for (let i = from; i <= to; i += 1) {
-					selectedNotes.push(notesInFolder[i]);
-				}
-				this.setSelectedNotes(selectedNotes);
-			}
-			else if (ev.metaKey) this.toggleSelectedNotes([item]);
-			else this.setSelectedNotes([item], true);
-		},
-
-		getElFromNote (note) {
-			return this.refs.notelistel.querySelector('.note-' + note.id);
-		},
-
-		getNoteFromEl (el) {
-			const {notesInFolder} = this.store.get();
-			const id = parseInt(el.dataset.id, 10) || null;
-			return notesInFolder.find(n => n.id === id);
-		},
-
-		toggleSelectedNotes (items) {
-			let {selectedNotes} = this.store.get()
-			items.forEach(item => {
-				const idx = selectedNotes.indexOf(item);
-				if (idx > -1) selectedNotes.splice(idx, 1);
-				else selectedNotes.push(item);
-			});
-			this.setSelectedNotes(selectedNotes, true);
-		},
-
-		setSelectedNotes (notes, replace) {
-			let {selectedNotes} = this.store.get()
-			if (replace) selectedNotes = [];
-			selectedNotes.push(...new Set(notes));
-			this.store.set({ selectedNotes: unique(selectedNotes) })
-		},
-
-		focusNoteUpDown (ev, where, elem) {
-			if (!elem) return;
-			ev.preventDefault();
-
-			let newElem;
-			if (where === 'up') newElem = elem.previousElementSibling;
-			else if (where === 'down') newElem = elem.nextElementSibling;
-			if (!newElem) return;
-
-			if (elem.closest('.notes')) {
-				const notes = [];
-				if (ev.shiftKey) notes.push(this.getNoteFromEl(elem));
-				notes.push(this.getNoteFromEl(newElem));
-				this.setSelectedNotes(notes, !ev.shiftKey);
-			}
-
-			if (newElem && newElem.matches('.list-item')) newElem.focus();
-		},
-
-		unselectNotes () {
-			this.store.set({ selectedNotes: [] });
-		},
-
-		open (ev, note) {
-			if (this.store.get().mode === 'view') this.store.set({ note });
-			else EVENT.fire(EVENT.focus.editor);
-		},
+onMount(() => {
+	EVENT.on(EVENT.notes.load, load);
+	EVENT.on(EVENT.focus.firstNote, focusFirstNote);
+	EVENT.on(EVENT.focus.selectedNote, focusSelectedNote);
+	EVENT.on(EVENT.focus.updown, focusNoteUpDown);
+	EVENT.on(EVENT.focus.selectedFolder, unselectNotes);
+});
 
 
-		sortby (ev, what) {
-			ev.stopPropagation();
-			const {sort} = this.store.get();
-			sort.by = what;
-			this.store.set({ sort });
+function isSelected (item, _selectedNotes) {
+	if (!_selectedNotes.length || !item) return false;
+	return !!_selectedNotes.find(n => {
+		return n.id === item.id;
+	});
+}
+
+
+function load () {
+	Data.Notes.get().then(_notes => {
+		_notes.forEach(n => { n.thumb = getImageFromMarkdown(n.text); });
+		notes.set(_notes);
+
+		const selectedNote = $note;
+		if (selectedNote && selectedNote.id && !selectedNote.title) {
+			const _note = _notes.find(n => n.id === selectedNote.id);
+			note.set(_note);
+			EVENT.fire(EVENT.focus.selectedNote);
 		}
+	});
+
+}
+
+function ondragstart (ev, item) {
+	ev.dataTransfer.setData('itemId', item.id);
+}
+
+async function focusFirstNote () {
+	await tick();
+	const noteEl = document.querySelector('.notes .note');
+	if (noteEl) {
+		const _note = getNoteFromEl(noteEl);
+		if (_note) setSelectedNotes([_note], true);
+		noteEl.focus();
 	}
-};
+	// no notes - focus first folder
+	else EVENT.fire(EVENT.focus.firstFolder);
+}
+
+async function focusSelectedNote () {
+	await tick();
+	const noteEl = getElFromNote($note);
+	if ($note) setSelectedNotes([$note], true);
+	if (noteEl) noteEl.focus();
+}
+
+function select (ev, item) {
+	if (ev.shiftKey) {
+		const noteEl = ev.target.closest('.note');
+		const _selectedNotes = [];
+		const noteArray = Array.from(noteEl.parentNode.children);
+		const noteIdx = noteArray.indexOf(noteEl);
+		const focusedEl = getElFromNote($note);
+		const focusedIdx = noteArray.indexOf(focusedEl);
+		const from = Math.min(focusedIdx, noteIdx);
+		const to = Math.max(focusedIdx, noteIdx);
+
+		for (let i = from; i <= to; i += 1) {
+			_selectedNotes.push($notesInFolder[i]);
+		}
+		setSelectedNotes(_selectedNotes);
+	}
+	else if (ev.metaKey) toggleSelectedNotes([item]);
+	else setSelectedNotes([item], true);
+}
+
+function getElFromNote (_note) {
+	return notelistel.querySelector('.note-' + _note.id);
+}
+
+function getNoteFromEl (el) {
+	const id = parseInt(el.dataset.id, 10) || null;
+	return $notesInFolder.find(n => n.id === id);
+}
+
+function toggleSelectedNotes (items) {
+	let _selectedNotes = $selectedNotes;
+	items.forEach(item => {
+		const idx = _selectedNotes.indexOf(item);
+		if (idx > -1) _selectedNotes.splice(idx, 1);
+		else _selectedNotes.push(item);
+	});
+	setSelectedNotes(_selectedNotes, true);
+}
+
+function setSelectedNotes (_notes, replace) {
+	let _selectedNotes = Array.from($selectedNotes);
+	if (replace) _selectedNotes = [];
+	_selectedNotes.push(...new Set(_notes));
+	selectedNotes.set(unique(_selectedNotes));
+}
+
+function focusNoteUpDown (ev, where, elem) {
+	if (!elem) return;
+	ev.preventDefault();
+
+	let newElem;
+	if (where === 'up') newElem = elem.previousElementSibling;
+	else if (where === 'down') newElem = elem.nextElementSibling;
+	if (!newElem) return;
+
+	if (elem.closest('.notes')) {
+		const _notes = [];
+		if (ev.shiftKey) _notes.push(getNoteFromEl(elem));
+		_notes.push(getNoteFromEl(newElem));
+		setSelectedNotes(_notes, !ev.shiftKey);
+	}
+
+	if (newElem && newElem.matches('.list-item')) newElem.focus();
+}
+
+function unselectNotes () {
+	selectedNotes.set([]);
+}
+
+function open (ev, _note) {
+	if ($mode === 'view') note.set(_note);
+	else EVENT.fire(EVENT.focus.editor);
+}
+
+
+function sortby (ev, what) {
+	ev.stopPropagation();
+	const _sort = $sort;
+	_sort.by = what;
+	sort.set(_sort);
+}
+
 </script>

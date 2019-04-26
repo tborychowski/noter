@@ -7,7 +7,7 @@
 
 <div class="editor {$mode} {selectedLength > 1 ? 'editor-hidden' : ''}">
 	{#if $markedNote}
-	<form on:submit="save(event)">
+	<form on:submit="{save}">
 		<div class="editor-header">
 			<div class="editor-header-row view">
 				<span class="note-title">{$markedNote.title || ''}</span>
@@ -20,30 +20,30 @@
 					{/if}
 				</div>
 				{#if $markedNote.deleted_at}
-				<button type="button" class="btn-icon ion-md-undo btn-edit" on:click="undelete()" title="Undelete (u)"></button>
+				<button type="button" class="btn-icon ion-md-undo btn-edit" on:click="{undelete}" title="Undelete (u)"></button>
 				{/if}
-				<button type="button" class="btn-icon ion-md-create btn-edit" on:click="edit($markedNote)" title="Edit (e)"></button>
+				<button type="button" class="btn-icon ion-md-create btn-edit" on:click="{() => edit($markedNote)}" title="Edit (e)"></button>
 			</div>
 			<div class="editor-header-row edit">
 				<label>Folder:</label>
 				<input class="note-folder-input"
 					placeholder="folder"
-					ref:folder
-					bind:value="note.folder"
-					on:keydown="onkeydown(event)">
+					bind:this={folderInput}
+					bind:value="{$note.folder}"
+					on:keydown="{onkeydown}">
 				<div class="flex-filler"></div>
 				<button type="submit" class="btn-icon ion-md-checkmark btn-save success" title="Save (Enter)"></button>
 				{#if note.id}
-					<button type="button" class="btn-icon ion-md-trash btn-remove danger" on:click="del()" title="Move to bin"></button>
+					<button type="button" class="btn-icon ion-md-trash btn-remove danger" on:click="{del}" title="Move to bin"></button>
 				{/if}
-				<button type="button" class="btn-icon ion-md-close btn-cancel" on:click="cancel()" title="Cancel (Esc)"></button>
+				<button type="button" class="btn-icon ion-md-close btn-cancel" on:click="{cancel}" title="Cancel (Esc)"></button>
 			</div>
 			<div class="editor-header-row edit">
 				<input class="note-title-input"
 					placeholder="New note"
-					ref:title
-					bind:value="note.title"
-					on:keydown="onkeydown(event)">
+					bind:this={title}
+					bind:value="{$note.title}"
+					on:keydown="{onkeydown}">
 			</div>
 		</div>
 
@@ -59,7 +59,7 @@
 			</div>
 		{:else}
 			<div class="scroller">
-				<textarea ref:text bind:value="note.text" on:keydown="onkeydown(event)"></textarea>
+				<textarea bind:this={text} bind:value="{$note.text}" on:keydown="{onkeydown}"></textarea>
 			</div>
 		{/if}
 	</form>
@@ -68,170 +68,167 @@
 
 
 <script>
-import {Data, Store, EVENT} from '../data';
+import {onMount} from 'svelte';
+import {Data, EVENT} from '../data';
+import {notes, note, markedNote, selectedNotes, mode, folder} from '../stores';
 import {timeAgo} from '../util';
 
-export default {
-	store: () => Store,
-	data () {
-		return { note: {} }
-	},
-	computed: {
-		selectedLength ({$selectedNotes}) {
-			return $selectedNotes && $selectedNotes.length || 0;
-		},
-		clones ({$selectedNotes}) {
-			if (!$selectedNotes || $selectedNotes.length < 2) return [];
-			const len = Math.min($selectedNotes.length - 1, 5);
-			return new Array(len).fill(0).map((a, i) => len - i)
-		}
-	},
-	helpers: {
-		timeAgo
-	},
-	oncreate () {
-		this.store.on('state', ({ current, previous, changed }) => {
-			if (changed.note && current.note) {
-				if (!current.note.id) this.edit();
-			}
-		});
+onMount(() => {
+	EVENT.on(EVENT.notes.new, newNote);
+	EVENT.on(EVENT.notes.del, del);
+	EVENT.on(EVENT.notes.undelete, undelete);
+	EVENT.on(EVENT.edit.start, edit);
+	EVENT.on(EVENT.edit.check, checkEditMode);
+	EVENT.on(EVENT.focus.editor, focusEditor);
+	EVENT.on(EVENT.focus.editorView, focusEditorView);
+})
 
-		EVENT.on(EVENT.notes.new, this.newNote.bind(this));
-		EVENT.on(EVENT.notes.del, this.del.bind(this));
-		EVENT.on(EVENT.notes.undelete, this.undelete.bind(this));
-		EVENT.on(EVENT.edit.start, this.edit.bind(this));
-		EVENT.on(EVENT.edit.check, this.checkEditMode.bind(this));
-		EVENT.on(EVENT.focus.editor, this.focusEditor.bind(this));
-		EVENT.on(EVENT.focus.editorView, this.focusEditorView.bind(this));
-	},
-	methods: {
-		onkeydown (ev) {
-			if (this.store.get().mode === 'edit') {
-				if (ev.key === 'Escape') {
-					ev.preventDefault();
-					ev.stopPropagation();
-					this.cancel();
-				}
-				else if (ev.key === 'ArrowDown') {
-					if (ev.target.matches('.note-folder-input')) this.refs.title.focus();
-					else if (ev.target.matches('.note-title-input')) this.refs.text.focus();
-				}
-				else if (ev.key === 'ArrowUp') {
-					if (ev.target.matches('.note-title-input')) this.refs.folder.focus();
-					// else if (ev.target.matches('.note-title-input')) this.refs.text.focus();
-				}
-				else if (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey)) this.save();
-			}
-		},
+let title;
+let text;
+let folderInput;
+let clones = [];
+let selectedLength = 0;
 
-		newNote () {
-			let {mode, folder} = this.store.get();
-			if (mode !== 'view') return this.focusEditor();
-			if (folder === 'Bin') folder = '';
-			const note = { title: '', text: '', folder: folder || '' };
-			this.store.set({ note });
-		},
+selectedNotes.subscribe(sel => {
+	selectedLength = sel.length || 0;
 
-		checkEditMode () {
-			if (this.store.get().mode !== 'view') this.focusEditor();
-		},
-
-		focusEditor () {
-			document.querySelector('.note-folder-input').select();
-		},
-
-		focusEditorView () {
-			document.querySelector('.editor .scroller').focus();
-		},
-
-		edit () {
-			const {mode, note} = this.store.get();
-			if (mode !== 'edit') {
-				this.store.set({ mode: 'edit' });
-				this.set({ note: Object.assign({}, note) });
-				setTimeout(() => this.refs.title.select(), 100);
-			}
-		},
-
-		cancel () {
-			const note = this.get().note;
-			const noNote = (!note || !note.id);
-			this.store.set({ mode: 'view' });
-
-			if (noNote) this.store.set({ note: null });
-			else this.focusEditorView();
-		},
-
-		save (e) {
-			if (e) e.preventDefault();
-			let note = this.get().note;
-			Data.Notes.save(note).then(res => {
-				if (res.id) note = res;
-				this.updateNoteInStore(note);
-				this.cancel();
-				this.store.set({ note, folder: note.folder });
-			});
-		},
-
-		updateNoteInStore (note) {
-			const notes = this.store.get().notes;
-			const idx = notes.findIndex(n => n.id === note.id);
-			if (idx > -1) notes[idx] = note;
-			else notes.push(note);
-			this.store.set({ notes, note });
-		},
-
-		undelete () {
-			const {notes, selectedNotes} = this.store.get();
-			if (!selectedNotes.length) return;
-
-			const ids = selectedNotes.map(n => n.id);
-
-			Data.Notes.undelete(ids).then(res => {
-				selectedNotes.forEach(selectedNote => {
-					const idx = notes.findIndex(n => n.id === selectedNote.id);
-					const note = notes[idx];
-					delete note.deleted_at;
-				});
-				this.store.set({ notes, folder: '', note: null });
-				const noteMsg = selectedNotes.length > 1 ? 'Notes' : 'Note';
-				EVENT.fire(EVENT.toast.show, `${noteMsg} restored`);
-				EVENT.fire(EVENT.focus.selectedNote);
-			});
-		},
-
-		del () {
-			const {notes, selectedNotes} = this.store.get();
-			if (!selectedNotes.length) return;
-
-			const q = selectedNotes.length > 1 ? `${selectedNotes.length} notes` : `"${selectedNotes[0].title}"`;
-
-			if (window.confirm(`Are you sure you wish to delete ${q}?`)) {
-				const delfn = (selectedNotes[0].deleted_at ? 'del' : 'bin');
-				const ids = selectedNotes.map(n => n.id);
-
-				Data.Notes[delfn](ids).then(res => {
-					this.close();
-
-					selectedNotes.forEach(selectedNote => {
-						const idx = notes.findIndex(n => n.id === selectedNote.id);
-						const note = notes[idx];
-
-						if (delfn === 'bin') note.deleted_at = new Date();
-						else notes.splice(idx, 1);
-					});
-
-					this.store.set({ notes });
-					const noteMsg = selectedNotes.length > 1 ? 'Notes' : 'Note';
-					EVENT.fire(EVENT.toast.show, delfn === 'bin' ? `${noteMsg} to bin` : `${noteMsg} deleted`);
-					EVENT.fire(EVENT.focus.firstNote);
-				});
-			}
-		},
-
-		close () {
-			this.store.set({ mode: 'view', note: null });
-		}
+	if (!sel || selectedLength < 2) clones = [];
+	else {
+		const len = Math.min(selectedLength - 1, 5);
+		clones = new Array(len).fill(0).map((a, i) => len - i)
 	}
-};
+});
+
+
+
+function onkeydown (ev) {
+	if ($mode === 'edit') {
+		if (ev.key === 'Escape') {
+			ev.preventDefault();
+			ev.stopPropagation();
+			cancel();
+		}
+		else if (ev.key === 'ArrowDown') {
+			if (ev.target.matches('.note-folder-input')) title.focus();
+			else if (ev.target.matches('.note-title-input')) text.focus();
+		}
+		else if (ev.key === 'ArrowUp') {
+			if (ev.target.matches('.note-title-input')) folderInput.focus();
+			// else if (ev.target.matches('.note-title-input')) text.focus();
+		}
+		else if (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey)) save();
+	}
+}
+
+function newNote () {
+	if ($mode !== 'view') return focusEditor();
+	if ($folder === 'Bin') folder = '';
+	const _note = { title: '', text: '', folder: $folder || '' };
+	note.set(_note);
+	edit();
+}
+
+function checkEditMode () {
+	if ($mode !== 'view') focusEditor();
+}
+
+function focusEditor () {
+	document.querySelector('.note-folder-input').select();
+}
+
+function focusEditorView () {
+	document.querySelector('.editor .scroller').focus();
+}
+
+function edit () {
+	if ($mode !== 'edit') {
+		mode.set('edit');
+		setTimeout(() => title.select(), 100);
+	}
+}
+
+function cancel () {
+	const noNote = (!$note || !$note.id);
+	mode.set('view');
+
+	if (noNote) note.set(null);
+	else focusEditorView();
+}
+
+function save (e) {
+	if (e) e.preventDefault();
+	let _note = $note;
+	Data.Notes.save(_note).then(res => {
+		if (res.id) _note = res;
+		updateNoteInStore(_note);
+		cancel();
+		note.set(_note);
+		folder.set(_note.folder);
+		selectedNotes.set([_note]);
+	});
+}
+
+function updateNoteInStore (_note) {
+	const _notes = $notes;
+	const idx = _notes.findIndex(n => n.id === _note.id);
+	if (idx > -1) _notes[idx] = _note;
+	else _notes.push(_note);
+	notes.set(_notes);
+	note.set(_note);
+}
+
+function undelete () {
+	if (!$selectedNotes.length) return;
+
+	const ids = $selectedNotes.map(n => n.id);
+
+	Data.Notes.undelete(ids).then(res => {
+		$selectedNotes.forEach(selectedNote => {
+			const idx = $notes.findIndex(n => n.id === selectedNote.id);
+			const _note = $notes[idx];
+			delete _note.deleted_at;
+		});
+		notes.set($notes);
+		folder.set('');
+		// note.set(null);
+
+
+		const noteMsg = $selectedNotes.length > 1 ? 'Notes' : 'Note';
+		EVENT.fire(EVENT.toast.show, `${noteMsg} restored`);
+		EVENT.fire(EVENT.focus.selectedNote);
+	});
+}
+
+function del () {
+	if (!$selectedNotes.length) return;
+
+	const q = $selectedNotes.length > 1 ? `${$selectedNotes.length} notes` : `"${$selectedNotes[0].title}"`;
+
+	if (window.confirm(`Are you sure you wish to delete ${q}?`)) {
+		const delfn = ($selectedNotes[0].deleted_at ? 'del' : 'bin');
+		const ids = $selectedNotes.map(n => n.id);
+
+		Data.Notes[delfn](ids).then(res => {
+			close();
+
+			$selectedNotes.forEach(selectedNote => {
+				const idx = $notes.findIndex(n => n.id === selectedNote.id);
+				const _note = $notes[idx];
+
+				if (delfn === 'bin') _note.deleted_at = new Date();
+				else $notes.splice(idx, 1);
+			});
+
+			notes.set($notes);
+			const noteMsg = $selectedNotes.length > 1 ? 'Notes' : 'Note';
+			EVENT.fire(EVENT.toast.show, delfn === 'bin' ? `${noteMsg} moved to bin` : `${noteMsg} deleted`);
+			EVENT.fire(EVENT.focus.firstNote);
+		});
+	}
+}
+
+function close () {
+	mode.set('view');
+	note.set(null);
+}
 </script>

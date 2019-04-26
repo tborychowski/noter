@@ -57,7 +57,7 @@ function slugify (text) {
 }
 
 
-function setUrl ({ folder, note }) {
+function setUrl (folder, note) {
 	const chunks = [];
 	if (folder !== null) chunks.push(folder);
 	if (note) chunks.push(note.id);
@@ -66,10 +66,12 @@ function setUrl ({ folder, note }) {
 	location.hash = path;
 }
 
-function getStateFromUrl () {
-	let [folder, note] = location.hash.substr(2).split('/');
-	if (note) note = { id: +note };
-	return { folder, note };
+
+
+function setStateFromUrl (folder, note) {
+	let [_folder, _note] = location.hash.substr(2).split('/');
+	if (_folder) folder.set(_folder);
+	if (_note) note.set({ id: +_note });
 }
 
 
@@ -98,7 +100,7 @@ export {
 	timeAgo,
 	slugify,
 	setUrl,
-	getStateFromUrl,
+	setStateFromUrl,
 	getImageFromMarkdown,
 	unique,
 };

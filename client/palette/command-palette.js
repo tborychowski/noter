@@ -154,7 +154,7 @@ CommandPalette.prototype.initEvents = function () {
 	this.input.addEventListener('keydown', this.onKeydown.bind(this));
 	this.input.addEventListener('keypress', this.onKeypress.bind(this));
 	this.el.addEventListener('click', this.onClick.bind(this));
-	document.addEventListener('mousedown', this.onDocumentClick.bind(this));
+	document.addEventListener('click', this.onDocumentClick.bind(this), true);
 	document.addEventListener('keydown', this.onDocumentKeyDown.bind(this));
 };
 
@@ -170,7 +170,11 @@ CommandPalette.prototype.onDocumentKeyDown = function (e) {
 CommandPalette.prototype.onDocumentClick = function (e) {
 	if (e.target.closest(`.${className}`)) return;
 	this.state.focused = false;
-	if (this.state.open) this.close();
+	if (this.state.open) {
+		e.stopPropagation();
+		e.preventDefault();
+		this.close();
+	}
 };
 
 

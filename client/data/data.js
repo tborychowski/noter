@@ -6,7 +6,7 @@ function req (url, method = 'GET', params) {
 	};
 	if (params) {
 		opts.body = JSON.stringify(params);
-		if (params.id && typeof params.id === 'string') url += `/${params.id}`;
+		if (params.id && typeof params.id !== 'undefined') url += `/${params.id}`;
 	}
 	return fetch(`api/${url}`, opts).then(res => res.json());
 }

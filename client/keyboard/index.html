@@ -1,59 +1,58 @@
 <script>
-import {Store, EVENT} from '../data';
+import { onMount } from 'svelte';
+import {EVENT} from '../data';
+import {paletteVisible, mode, note} from '../stores';
 
-export default {
-	store: () => Store,
-	oncreate () {
-		document.addEventListener('keydown', this.onkeydown.bind(this));
-	},
+onMount(() => {
+	document.addEventListener('keydown', onkeydown);
+});
 
-	methods: {
-		onkeydown (ev) {
-			if (this.store.get().paletteVisible) return;
 
-			const {note} = this.store.get();
-			const isEdit = (this.store.get().mode === 'edit');
-			const newNote = () => EVENT.fire(EVENT.notes.new);
-			const editNote = () => { if (note) EVENT.fire(EVENT.edit.start); };
-			const undeleteNote = () => { EVENT.fire(EVENT.notes.undelete); };
-			const delNote = () => { if (ev.metaKey || ev.ctrlKey) EVENT.fire(EVENT.notes.del); };
+function onkeydown (ev) {
+	if ($paletteVisible) return;
 
-			const keymap = {
-				e: editNote,
-				u: undeleteNote,
-				Enter: editNote,
-				Backspace: delNote,
-				n: newNote,
-				ArrowUp: e => this.goto(e, 'up'),
-				ArrowDown: e => this.goto(e, 'down'),
-				ArrowRight: e => this.goto(e, 'right'),
-				ArrowLeft: e => this.goto(e, 'left'),
-			};
-			if (keymap[ev.key] && !isEdit) keymap[ev.key](ev);
-		},
+	const isEdit = ($mode === 'edit');
+	const newNote = () => EVENT.fire(EVENT.notes.new);
+	const editNote = () => { if ($note) EVENT.fire(EVENT.edit.start); };
+	const undeleteNote = () => { EVENT.fire(EVENT.notes.undelete); };
+	const delNote = () => { if (ev.metaKey || ev.ctrlKey) EVENT.fire(EVENT.notes.del); };
 
-		goto (ev, where) {
-			if (where === 'folders') return EVENT.fire(EVENT.focus.selectedFolder);
-			if (where === 'notes') return EVENT.fire(EVENT.focus.firstNote);
+	const keymap = {
+		e: editNote,
+		u: undeleteNote,
+		Enter: editNote,
+		Backspace: delNote,
+		n: newNote,
+		ArrowUp: e => goto(e, 'up'),
+		ArrowDown: e => goto(e, 'down'),
+		ArrowRight: e => goto(e, 'right'),
+		ArrowLeft: e => goto(e, 'left'),
+	};
+	if (keymap[ev.key] && !isEdit) keymap[ev.key](ev);
+}
 
-			const elem = document.activeElement;
-			const isNotes = elem && elem.closest('.notes');
-			const isFolders = elem && elem.closest('.folders');
-			const isEditor = elem && elem.closest('.editor');
 
-			if (!isFolders && !isNotes && !isEditor) return EVENT.fire(EVENT.focus.firstNote);
+function goto (ev, where) {
+	if (where === 'folders') return EVENT.fire(EVENT.focus.selectedFolder);
+	if (where === 'notes') return EVENT.fire(EVENT.focus.firstNote);
 
-			if (where === 'left') {
-				if (isNotes) return EVENT.fire(EVENT.focus.selectedFolder);
-				if (isEditor) return EVENT.fire(EVENT.focus.selectedNote);
-			}
-			else if (where === 'right') {
-				if (isFolders) return EVENT.fire(EVENT.focus.firstNote);
-				if (isNotes) return EVENT.fire(EVENT.focus.editorView);
-			}
-			else if (!isEditor) EVENT.fire(EVENT.focus.updown, ev, where, elem);
-		},
+	const elem = document.activeElement;
+	const isNotes = elem && elem.closest('.notes');
+	const isFolders = elem && elem.closest('.folders');
+	const isEditor = elem && elem.closest('.editor');
 
+	if (!isFolders && !isNotes && !isEditor) return EVENT.fire(EVENT.focus.firstNote);
+
+	if (where === 'left') {
+		if (isNotes) return EVENT.fire(EVENT.focus.selectedFolder);
+		if (isEditor) return EVENT.fire(EVENT.focus.selectedNote);
 	}
-};
+	else if (where === 'right') {
+		if (isFolders) return EVENT.fire(EVENT.focus.firstNote);
+		if (isNotes) return EVENT.fire(EVENT.focus.editorView);
+	}
+	else if (!isEditor) EVENT.fire(EVENT.focus.updown, ev, where, elem);
+}
+
+
 </script>
