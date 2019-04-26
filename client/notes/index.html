@@ -36,7 +36,7 @@
 
 
 <script>
-import {onMount} from 'svelte';
+import {onMount, tick} from 'svelte';
 import {Data, EVENT} from '../data';
 import {folder, notesInFolder, selectedNotes, sort, notes, note, mode} from '../stores';
 import {timeAgo, getImageFromMarkdown, unique} from '../util';
@@ -79,7 +79,8 @@ function ondragstart (ev, item) {
 	ev.dataTransfer.setData('itemId', item.id);
 }
 
-function focusFirstNote () {
+async function focusFirstNote () {
+	await tick();
 	const noteEl = document.querySelector('.notes .note');
 	if (noteEl) {
 		const _note = getNoteFromEl(noteEl);
@@ -90,7 +91,8 @@ function focusFirstNote () {
 	else EVENT.fire(EVENT.focus.firstFolder);
 }
 
-function focusSelectedNote () {
+async function focusSelectedNote () {
+	await tick();
 	const noteEl = getElFromNote($note);
 	if ($note) setSelectedNotes([$note], true);
 	if (noteEl) noteEl.focus();
