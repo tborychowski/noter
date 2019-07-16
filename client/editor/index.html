@@ -28,9 +28,15 @@
 				<label>Folder:</label>
 				<input class="note-folder-input"
 					placeholder="folder"
+					list="folders"
 					bind:this={folderInput}
 					bind:value="{$note.folder}"
 					on:keydown="{onkeydown}">
+				<datalist id="folders">
+					{#each $folders as folder}
+						<option value="{folder.name}" />
+					{/each}
+				</datalist>
 				<div class="flex-filler"></div>
 				<button type="submit" class="btn-icon ion-md-checkmark btn-save success" title="Save (Enter)"></button>
 				{#if note.id}
@@ -70,7 +76,7 @@
 <script>
 import {onMount} from 'svelte';
 import {Data, EVENT} from '../data';
-import {notes, note, markedNote, selectedNotes, mode, folder} from '../data/store';
+import {notes, note, markedNote, selectedNotes, mode, folder, folders} from '../data/store';
 import {timeAgo} from '../util';
 
 onMount(() => {
